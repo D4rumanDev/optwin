@@ -83,7 +83,7 @@ logs/
 - [ChrisTitusTech/winutil](https://github.com/ChrisTitusTech/winutil) — tweaks.json
 - [memstechtips/Winhance](https://github.com/memstechtips/Winhance) — privacy and interface tweaks
 - [simeononsecurity/Windows-Optimize-Harden-Debloat](https://github.com/simeononsecurity/Windows-Optimize-Harden-Debloat) — SCHANNEL TLS, network hardening, PS transcription
-- [undergroundwires/privacy.sexy](https://github.com/nicehash/NiceHashQuickMiner) — O&O ShutUp10 AI/Recall keys
+- [undergroundwires/privacy.sexy](https://github.com/undergroundwires/privacy.sexy) — O&O ShutUp10 AI/Recall keys
 
 ## License
 
