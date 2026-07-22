@@ -1,0 +1,31 @@
+{
+  "temp_paths": [
+    {"path": "%TEMP%",                                                    "label": "Temp usuario"},
+    {"path": "C:\\Windows\\Temp",                                         "label": "Temp sistema (Windows)"},
+    {"path": "%LOCALAPPDATA%\\Temp",                                      "label": "AppData\\Local\\Temp"},
+    {"path": "%LOCALAPPDATA%\\Microsoft\\Windows\\INetCache",             "label": "Internet Explorer Cache"}
+  ],
+  "bleachbit": [
+    "system.tmp",
+    "windows_explorer.thumbnail_database",
+    "system.memory_dump",
+    "system.muicache",
+    "system.mru",
+    "system.history",
+    "deepscan.tmp",
+    "google_chrome.cache",
+    "firefox.cache",
+    "microsoft_edge.cache",
+    "brave.cache"
+  ],
+  "cleanmgr_categories": [
+    "Downloaded Program Files",
+    "Windows Error Reporting Files",
+    "Previous Installations",
+    "Delivery Optimization Files",
+    "D3D Shader Cache",
+    "Windows Defender",
+    "Update Cleanup",
+    "Windows upgrade log files"
+  ]
+}

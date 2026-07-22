@@ -1,0 +1,31 @@
+{
+  "disabled": [
+    {"name": "DiagTrack",             "comment": "Telemetria Windows Connected User Experiences"},
+    {"name": "dmwappushservice",       "comment": "Telemetria companion"},
+    {"name": "MapsBroker",             "comment": "Mapas de Windows"},
+    {"name": "XblAuthManager",         "comment": "Xbox Live Auth Manager"},
+    {"name": "XblGameSave",            "comment": "Xbox Live Game Save"},
+    {"name": "XboxNetApiSvc",          "comment": "Xbox Live Networking"},
+    {"name": "Fax",                    "comment": "Servicio de fax"},
+    {"name": "NvTelemetryContainer",   "comment": "Telemetria NVIDIA"}
+  ],
+  "manual": [
+    {"name": "edgeupdate",             "comment": "Microsoft Edge Update"},
+    {"name": "igccservice",            "comment": "Intel Graphics Command Center"},
+    {"name": "igfxCUIService2.0.0.0",  "comment": "Intel HD Graphics Control Panel"},
+    {"name": "jhi_service",            "comment": "Intel DAL Host Interface"},
+    {"name": "AESMService",            "comment": "Intel SGX AESM"},
+    {"name": "cplspcon",               "comment": "Intel Content Protection HDCP"},
+    {"name": "SSDPSRV",                "comment": "SSDP Discovery (UPnP)"},
+    {"name": "upnphost",               "comment": "UPnP Device Host"},
+    {"name": "PcaSvc",                 "comment": "Asistente compatibilidad programas"},
+    {"name": "DPS",                    "comment": "Directiva de diagnostico"},
+    {"name": "whesvc",                 "comment": "Windows Hardware Error Architecture"},
+    {"name": "BthAvctpSvc",            "comment": "Bluetooth AVCTP (audio BT)"},
+    {"name": "WinRing0_1_2_0",         "comment": "MSR/IO kernel driver"}
+  ],
+  "startup_remove": [
+    "Adobe Acrobat Synchronizer",
+    "BraveSoftware Update"
+  ]
+}

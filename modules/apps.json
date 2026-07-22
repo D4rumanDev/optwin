@@ -1,0 +1,18 @@
+[
+  { "id": "Microsoft.WindowsTerminal",    "name": "Windows Terminal"      },
+  { "id": "Microsoft.PowerShell",         "name": "PowerShell 7"          },
+  { "id": "Git.Git",                       "name": "Git"                   },
+  { "id": "JanDeDobbeleer.OhMyPosh",      "name": "Oh My Posh"            },
+  { "id": "Google.Chrome",                 "name": "Google Chrome"         },
+  { "id": "Microsoft.VisualStudioCode",   "name": "VS Code"               },
+  { "id": "Brave.Brave",                   "name": "Brave"                 },
+  { "id": "BleachBit.BleachBit",          "name": "BleachBit"             },
+  { "id": "Microsoft.PowerToys",          "name": "PowerToys"             },
+  { "id": "VideoLAN.VLC",                 "name": "VLC"                   },
+  { "id": "Adobe.Acrobat.Reader.64-bit",  "name": "Adobe Acrobat Reader"  },
+  { "id": "ShareX.ShareX",               "name": "ShareX"                },
+  { "id": "Valve.Steam",                  "name": "Steam"                 },
+  { "id": "Tailscale.Tailscale",          "name": "Tailscale"             },
+  { "id": "GitHub.cli",                   "name": "GitHub CLI"            },
+  { "id": "uutils.coreutils",            "name": "coreutils"             }
+]

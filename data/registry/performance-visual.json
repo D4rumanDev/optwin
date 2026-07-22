@@ -1,0 +1,15 @@
+[
+  {"P": "HKCU:\\Control Panel\\Desktop",                                                     "N": "DragFullWindows",        "V": "0",   "T": "String"},
+  {"P": "HKCU:\\Control Panel\\Desktop\\WindowMetrics",                                       "N": "MinAnimate",             "V": "0",   "T": "String"},
+  {"P": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",               "N": "ListviewAlphaSelect",    "V": 0},
+  {"P": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",               "N": "ListviewShadow",         "V": 0},
+  {"P": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",               "N": "TaskbarAnimations",      "V": 0},
+  {"P": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\VisualEffects",          "N": "VisualFXSetting",        "V": 2},
+  {"P": "HKCU:\\Control Panel\\Desktop",                                                     "N": "UserPreferencesMask",    "V": [144, 18, 3, 128, 16, 0, 0, 0], "T": "Binary"},
+  {"P": "HKCU:\\Software\\Microsoft\\Windows\\DWM",                                            "N": "EnableAeroPeek",         "V": 0},
+  {"P": "HKCU:\\Control Panel\\Keyboard",                                                    "N": "KeyboardDelay",          "V": "0",   "T": "String"},
+  {"P": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",               "N": "TaskbarMn",              "V": 0},
+  {"P": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",               "N": "ShowTaskViewButton",     "V": 0},
+  {"P": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Search",                          "N": "SearchboxTaskbarMode",   "V": 0},
+  {"P": "HKCU:\\Control Panel\\Desktop",                                                     "N": "MenuShowDelay",          "V": "200", "T": "String"}
+]

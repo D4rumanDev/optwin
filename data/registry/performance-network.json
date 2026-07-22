@@ -1,0 +1,8 @@
+[
+  {"P": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\Tcpip6\\Parameters", "N": "DisabledComponents", "V": 32},
+  {"P": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\Tcpip\\Parameters",  "N": "TcpNoDelay",         "V": 1},
+  {"P": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\Tcpip\\Parameters",  "N": "TCPDelAckTicks",     "V": 0},
+  {"P": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\Tcpip\\Parameters",  "N": "Tcp1323Opts",        "V": 1},
+  {"P": "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile", "N": "NetworkThrottlingIndex", "V": -1},
+  {"P": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\Psched",                            "N": "NonBestEffortLimit",     "V": 0}
+]
