@@ -95,7 +95,7 @@ if (Test-SectionApplied "network-hardening-14" $regNetwork14) {
 Sep "07.15 POWERSHELL — Transcription"
 # ============================================================
 
-$psTransDir = "C:\ProgramData\PSTranscripts"
+$psTransDir = "$env:ProgramData\PSTranscripts"
 New-Item -ItemType Directory -Path $psTransDir -Force -ErrorAction SilentlyContinue | Out-Null
 
 $regPSTrans = @(

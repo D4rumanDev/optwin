@@ -322,7 +322,7 @@ if (-not (Get-Command winget -ErrorAction SilentlyContinue)) {
 Sep "08.6 ANDROID PLATFORM TOOLS — adb / fastboot en C:\platform-tools"
 # ============================================================
 
-$ptDest = "C:\platform-tools"
+$ptDest = "$env:SystemDrive\platform-tools"
 $ptExe  = "$ptDest\adb.exe"
 
 if (Test-Path $ptExe) {

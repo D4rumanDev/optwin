@@ -144,7 +144,7 @@ if ($IsLaptop) {
         powercfg.exe /hibernate off
         Set-Reg "HKLM:\System\CurrentControlSet\Control\Session Manager\Power" "HibernateEnabled" 0
         Set-Reg "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\FlyoutMenuSettings" "ShowHibernateOption" 0
-        $hiberGB = [math]::Round(((Get-Item 'C:\hiberfil.sys' -ErrorAction SilentlyContinue)?.Length ?? 0) / 1GB, 1)
+        $hiberGB = [math]::Round(((Get-Item "$env:SystemDrive\hiberfil.sys" -ErrorAction SilentlyContinue)?.Length ?? 0) / 1GB, 1)
         OK "Hibernacion desactivada$(if ($hiberGB -gt 0) { " (libera ~$hiberGB GB en SSD)" })"
     } catch { Err "Hibernacion — $_" }
 }

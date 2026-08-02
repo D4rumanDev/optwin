@@ -175,7 +175,7 @@ Sep "04.12 PRIVACIDAD — AutoLogger ETL"
 # Denegar escritura de SYSTEM en el directorio de logs de diagrama de arranque
 # Impide que DiagTrack/telemetria escriba logs incluso si el servicio se reactiva
 try {
-    $etlPath = "C:\ProgramData\Microsoft\Diagnosis\ETLLogs\AutoLogger"
+    $etlPath = "$env:ProgramData\Microsoft\Diagnosis\ETLLogs\AutoLogger"
     if (Test-Path $etlPath) {
         $aclOut = icacls $etlPath 2>&1 | Out-String
         if ($aclOut -imatch "SYSTEM.*Deny") {

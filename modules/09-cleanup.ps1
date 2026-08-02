@@ -24,8 +24,8 @@ function Remove-TempFolder {
 # Detección temprana de BleachBit para condicionar la limpieza manual
 $bleachbitExeEarly = @(
     "$env:LOCALAPPDATA\BleachBit\bleachbit_console.exe",
-    "C:\Program Files\BleachBit\bleachbit_console.exe",
-    "C:\Program Files (x86)\BleachBit\bleachbit_console.exe"
+    "$env:ProgramFiles\BleachBit\bleachbit_console.exe",
+    "${env:ProgramFiles(x86)}\BleachBit\bleachbit_console.exe"
 ) | Where-Object { Test-Path $_ } | Select-Object -First 1
 
 # A1: verificar firma Authenticode antes de ejecutar como elevado.
@@ -62,13 +62,13 @@ if (-not $bleachbitExeEarly) {
 # Limpiar semanalmente reinicia el aprendizaje y degrada el rendimiento de arranque
 
 # SoftwareDistribution siempre manual — BleachBit no puede detener/reiniciar el servicio WU
-Remove-TempFolder "C:\Windows\SoftwareDistribution\Download" "Windows Update cache"
+Remove-TempFolder "$env:SystemRoot\SoftwareDistribution\Download" "Windows Update cache"
 
 # Logs de Windows antiguos (> 30 dias) — proceso independiente (Get-ChildItem -Recurse puede ser lento)
 $logsJob = Start-Job -Name "LogsCleanup" -ScriptBlock {
     param($logPath)
     $cutoff  = (Get-Date).AddDays(-30)
-    $oldLogs = Get-ChildItem "C:\Windows\Logs" -Recurse -Force -ErrorAction SilentlyContinue |
+    $oldLogs = Get-ChildItem "$env:SystemRoot\Logs" -Recurse -Force -ErrorAction SilentlyContinue |
                Where-Object { -not $_.PSIsContainer -and $_.LastWriteTime -lt $cutoff }
     $size  = ($oldLogs | Measure-Object -Property Length -Sum).Sum
     $count = ($oldLogs | Measure-Object).Count
@@ -117,8 +117,8 @@ if ($dismWinSxsAge -lt 30) {
 }
 
 # Windows.old — gestionado por cleanmgr "Previous Installations" (job en background)
-if (Test-Path "C:\Windows.old") {
-    $oldSize = (Get-ChildItem "C:\Windows.old" -Recurse -Force -ErrorAction SilentlyContinue |
+if (Test-Path "$env:SystemDrive\Windows.old") {
+    $oldSize = (Get-ChildItem "$env:SystemDrive\Windows.old" -Recurse -Force -ErrorAction SilentlyContinue |
                 Measure-Object -Property Length -Sum).Sum
     OK "Windows.old detectado ($([math]::Round($oldSize/1GB,1)) GB) — eliminacion delegada a cleanmgr (job en background)"
 } else {
