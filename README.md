@@ -49,6 +49,30 @@ pwsh -ExecutionPolicy Bypass -File "...\optimizar-windows.ps1" -Skip 08,09
 
 **winget app list** — `modules/apps.json` lists apps to install/upgrade. Edit this file to match your setup before first run.
 
+## Companion: fix-habituales.ps1
+
+Standalone troubleshooting script for common Windows issues. Runs independently from the main optimization script — no shared state, no side effects on optwin's FSM.
+
+```powershell
+# Run as Administrator — all sections
+pwsh -ExecutionPolicy Bypass -File "$env:USERPROFILE\Scripts\fix-habituales.ps1"
+
+# Run specific sections only
+pwsh -ExecutionPolicy Bypass -File "...\fix-habituales.ps1" -Sections 1,3,5
+```
+
+| # | Section | Diagnostic signal | Fix |
+|---|---------|-------------------|-----|
+| 1 | **Bluetooth** | Adapter `Status=Error` (PnP code 10/43) | `Disable-PnpDevice` + `Enable-PnpDevice` |
+| 2 | **bthserv** | Service not running | Restart service |
+| 3 | **Printers / Spooler** | Files in `spool\PRINTERS` or Spooler stopped | Stop Spooler → clear queue → restart |
+| 4 | **SIM / WWAN** | `WwanSvc` stopped or WWAN adapter `Status=Error` | Restart `WwanSvc`; if still failing, PnP reset |
+| 5 | **DNS cache** | Always safe to flush | `Clear-DnsClientCache`; restarts `Dnscache` only if service is in error |
+| 6 | **Windows Update** | Downloads older than 7 days in `SoftwareDistribution\Download` | Stop WU services → clear `SoftwareDistribution\Download` + `catroot2` → restart |
+| 7 | **WSL / HNS** | `vEthernet (WSL)` adapter missing or down | Restart HNS (recreates virtual adapters for WSL and Docker) |
+
+All fixes operate at the Windows service/PnP layer — no manufacturer-specific tools required. Hardware failures (dead adapter, unseated SIM) are reported but cannot be resolved by software.
+
 ## What it does NOT do
 
 - No Spectre/Meltdown registry patches (Windows 11 manages this via firmware)
