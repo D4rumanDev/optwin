@@ -62,11 +62,38 @@ function Restart-Svc {
     }
 }
 
+# Disable+Enable PnP — fuerza al driver manager a reinicializar el dispositivo.
+# Devuelve el Status tras el reset ('OK', 'Error', etc.) o $null si falla el ciclo.
+function Reset-PnpDevice {
+    param([string]$InstanceId, [string]$Label, [int]$DisableSleep = 2, [int]$EnableSleep = 3)
+    try {
+        Disable-PnpDevice -InstanceId $InstanceId -Confirm:$false -ErrorAction Stop
+        Start-Sleep -Seconds $DisableSleep
+        Enable-PnpDevice  -InstanceId $InstanceId -Confirm:$false -ErrorAction Stop
+        Start-Sleep -Seconds $EnableSleep
+        return (Get-PnpDevice -InstanceId $InstanceId -ErrorAction SilentlyContinue).Status
+    } catch {
+        Err "Reset PnP fallido: $Label — $_"
+        return $null
+    }
+}
+
+# Elimina ficheros en un directorio y devuelve el número de borrados exitosos.
+function Clear-DirectoryFiles {
+    param([string]$Path, [switch]$Recurse)
+    if (-not (Test-Path $Path)) { return 0 }
+    $deleted = 0
+    Get-ChildItem $Path -File -Recurse:$Recurse -ErrorAction SilentlyContinue | ForEach-Object {
+        try {
+            Remove-Item $_.FullName -Force -ErrorAction Stop
+            $deleted++
+        } catch {}
+    }
+    return $deleted
+}
+
 # ── 1. BLUETOOTH — CM_PROB_FAILED_START ──────────────────────────────────────
 if (Sep 1 "BLUETOOTH — fallo al arrancar") {
-    # Diagnóstico: adaptador en Status=Error (código PnP 10 o 43).
-    # Fix: Disable+Enable fuerza al PnP manager a reinicializar el driver.
-
     $btDevices = Get-PnpDevice -Class Bluetooth -ErrorAction SilentlyContinue |
                  Where-Object { $_.Status -eq 'Error' }
 
@@ -75,20 +102,9 @@ if (Sep 1 "BLUETOOTH — fallo al arrancar") {
     } else {
         foreach ($dev in $btDevices) {
             Info "Detectado en error: $($dev.FriendlyName)"
-            try {
-                Disable-PnpDevice -InstanceId $dev.InstanceId -Confirm:$false -ErrorAction Stop
-                Start-Sleep -Seconds 2
-                Enable-PnpDevice  -InstanceId $dev.InstanceId -Confirm:$false -ErrorAction Stop
-                Start-Sleep -Seconds 3
-                $after = Get-PnpDevice -InstanceId $dev.InstanceId -ErrorAction SilentlyContinue
-                if ($after.Status -eq 'OK') {
-                    OK "Bluetooth restaurado: $($dev.FriendlyName)"
-                } else {
-                    Err "Sigue en error tras reset PnP: $($dev.FriendlyName) (Status: $($after.Status))"
-                }
-            } catch {
-                Err "Reset PnP fallido: $($dev.FriendlyName) — $_"
-            }
+            $status = Reset-PnpDevice $dev.InstanceId $dev.FriendlyName
+            if     ($status -eq 'OK')   { OK  "Bluetooth restaurado: $($dev.FriendlyName)" }
+            elseif ($null -ne $status)  { Err "Sigue en error tras reset PnP: $($dev.FriendlyName) (Status: $status)" }
         }
     }
 }
@@ -108,11 +124,8 @@ if (Sep 2 "BLUETOOTH — servicio de alto nivel (bthserv)") {
 
 # ── 3. IMPRESORAS — cola atascada y Spooler ───────────────────────────────────
 if (Sep 3 "IMPRESORAS — cola atascada / Spooler") {
-    # Diagnóstico: ficheros en spool\PRINTERS (trabajos pendientes) o Spooler caído.
-    # Fix: parar Spooler, limpiar cola, arrancar. Universal para cualquier impresora.
-
-    $spoolDir  = "$env:SystemRoot\System32\spool\PRINTERS"
-    $spooler   = Get-Service -Name 'Spooler' -ErrorAction SilentlyContinue
+    $spoolDir   = "$env:SystemRoot\System32\spool\PRINTERS"
+    $spooler    = Get-Service -Name 'Spooler' -ErrorAction SilentlyContinue
     $stuckFiles = if (Test-Path $spoolDir) {
         Get-ChildItem $spoolDir -File -ErrorAction SilentlyContinue
     } else { @() }
@@ -128,12 +141,13 @@ if (Sep 3 "IMPRESORAS — cola atascada / Spooler") {
         try {
             Stop-Service -Name 'Spooler' -Force -ErrorAction Stop
             Start-Sleep -Seconds 2
+
             $deleted = 0
-            Get-ChildItem $spoolDir -File -ErrorAction SilentlyContinue | ForEach-Object {
-                Remove-Item $_.FullName -Force -ErrorAction SilentlyContinue
-                $deleted++
+            $stuckFiles | ForEach-Object {
+                try { Remove-Item $_.FullName -Force -ErrorAction Stop; $deleted++ } catch {}
             }
             if ($deleted -gt 0) { OK "Cola limpiada: $deleted fichero(s) eliminado(s)" }
+
             Start-Service -Name 'Spooler' -ErrorAction Stop
             Start-Sleep -Seconds 2
             $after = (Get-Service 'Spooler').Status
@@ -147,16 +161,13 @@ if (Sep 3 "IMPRESORAS — cola atascada / Spooler") {
 
 # ── 4. SIM / WWAN ────────────────────────────────────────────────────────────
 if (Sep 4 "SIM / WWAN — detección y reset") {
-    # Diagnóstico: WwanSvc parado o adaptador celular con Status=Error.
-    # Fix: reiniciar WwanSvc; si persiste, disable/enable del dispositivo PnP.
     # WwanSvc abstrae todo el hardware celular — agnóstico de marca/modelo.
-
     $wwanSvc = Get-Service -Name 'WwanSvc' -ErrorAction SilentlyContinue
 
     if (-not $wwanSvc) {
         Skip "SIM/WWAN: WwanSvc no encontrado — este equipo no tiene hardware celular"
     } else {
-        $wwanDevices = Get-PnpDevice -Class 'Net' -ErrorAction SilentlyContinue |
+        $wwanDevices = Get-PnpDevice -Class 'Net'   -ErrorAction SilentlyContinue |
                        Where-Object { $_.FriendlyName -match 'WWAN|Mobile Broadband|Cellular|LTE|5G|4G|3G' }
         $wwanModems  = Get-PnpDevice -Class 'Modem' -ErrorAction SilentlyContinue |
                        Where-Object { $_.FriendlyName -match 'WWAN|Broadband|Cellular|LTE|5G|4G|3G|eSIM' }
@@ -176,12 +187,12 @@ if (Sep 4 "SIM / WWAN — detección y reset") {
                 Skip "SIM/WWAN: sin errores detectados"
             } else {
                 if ($svcStopped) { Info "WwanSvc en estado: $($wwanSvc.Status) — reiniciando" }
-                else { Info "$($wwanErrors.Count) adaptador(es) en error — reiniciando WwanSvc" }
+                else             { Info "$($wwanErrors.Count) adaptador(es) en error — reiniciando WwanSvc" }
 
-                $svcOk = Restart-Svc 'WwanSvc'
-                if ($svcOk) { OK "WwanSvc reiniciado" }
+                if (Restart-Svc 'WwanSvc') { OK "WwanSvc reiniciado" }
                 Start-Sleep -Seconds 5
 
+                # Re-query para ver si el reinicio del servicio ya los recuperó
                 $stillBad = $wwanErrors | Where-Object {
                     (Get-PnpDevice -InstanceId $_.InstanceId -ErrorAction SilentlyContinue).Status -eq 'Error'
                 }
@@ -191,19 +202,11 @@ if (Sep 4 "SIM / WWAN — detección y reset") {
                 } else {
                     Info "$($stillBad.Count) adaptador(es) siguen en error — reset PnP"
                     foreach ($dev in $stillBad) {
-                        try {
-                            Disable-PnpDevice -InstanceId $dev.InstanceId -Confirm:$false -ErrorAction Stop
-                            Start-Sleep -Seconds 3
-                            Enable-PnpDevice  -InstanceId $dev.InstanceId -Confirm:$false -ErrorAction Stop
-                            Start-Sleep -Seconds 5
-                            $after = Get-PnpDevice -InstanceId $dev.InstanceId -ErrorAction SilentlyContinue
-                            if ($after.Status -eq 'OK') { OK "WWAN restaurado: $($dev.FriendlyName)" }
-                            else {
-                                Err "Sigue en error tras reset PnP: $($dev.FriendlyName)"
-                                Info "→ Posible causa hardware: SIM no insertada, ranura defectuosa o driver corrupto"
-                            }
-                        } catch {
-                            Err "Reset PnP fallido: $($dev.FriendlyName) — $_"
+                        $status = Reset-PnpDevice $dev.InstanceId $dev.FriendlyName -DisableSleep 3 -EnableSleep 5
+                        if     ($status -eq 'OK')  { OK  "WWAN restaurado: $($dev.FriendlyName)" }
+                        elseif ($null -ne $status) {
+                            Err "Sigue en error tras reset PnP: $($dev.FriendlyName)"
+                            Info "→ Posible causa hardware: SIM no insertada, ranura defectuosa o driver corrupto"
                         }
                     }
                 }
@@ -214,13 +217,9 @@ if (Sep 4 "SIM / WWAN — detección y reset") {
 
 # ── 5. CACHÉ DNS ─────────────────────────────────────────────────────────────
 if (Sep 5 "CACHÉ DNS — flush y reset Dnscache") {
-    # Diagnóstico: no existe señal fiable de "caché corrupta" desde PowerShell,
-    # pero el flush es siempre inocuo (DNS resuelve de nuevo desde los servidores).
-    # Fix escalado: flush → si Dnscache lleva en error, también reiniciarlo.
-
+    # No existe señal fiable de "caché corrupta" — el flush siempre es inocuo.
     $dnsSvc = Get-Service -Name 'Dnscache' -ErrorAction SilentlyContinue
 
-    # Flush
     try {
         Clear-DnsClientCache -ErrorAction Stop
         OK "Caché DNS vaciada"
@@ -228,7 +227,6 @@ if (Sep 5 "CACHÉ DNS — flush y reset Dnscache") {
         Err "No se pudo vaciar la caché DNS — $_"
     }
 
-    # Solo reiniciar el servicio si está en estado de error
     if ($dnsSvc -and $dnsSvc.Status -ne 'Running') {
         Info "Dnscache en estado: $($dnsSvc.Status) — reiniciando"
         if (Restart-Svc 'Dnscache') { OK "Dnscache reiniciado" }
@@ -239,67 +237,40 @@ if (Sep 5 "CACHÉ DNS — flush y reset Dnscache") {
 
 # ── 6. WINDOWS UPDATE — reset del cliente ────────────────────────────────────
 if (Sep 6 "WINDOWS UPDATE — reset del cliente WU") {
-    # Diagnóstico: descargas antiguas atascadas en SoftwareDistribution\Download
-    # (ficheros con más de 7 días) o servicio wuauserv en estado de error.
-    # Fix: parar servicios dependientes, limpiar caches, reiniciar.
+    # Diagnóstico: descargas con más de 7 días en SoftwareDistribution\Download
+    # o wuauserv en estado distinto de Running/Stopped.
     # No toca la configuración de WU, solo el estado del cliente.
 
-    $wuSvc     = Get-Service -Name 'wuauserv' -ErrorAction SilentlyContinue
-    $sdPath    = "$env:SystemRoot\SoftwareDistribution\Download"
-    $cr2Path   = "$env:SystemRoot\System32\catroot2"
-    $cutoff    = (Get-Date).AddDays(-7)
+    $wuSvc   = Get-Service -Name 'wuauserv' -ErrorAction SilentlyContinue
+    $sdPath  = "$env:SystemRoot\SoftwareDistribution\Download"
+    $cr2Path = "$env:SystemRoot\System32\catroot2"
+    $cutoff  = (Get-Date).AddDays(-7)
 
     $stuckDl = if (Test-Path $sdPath) {
         Get-ChildItem $sdPath -File -Recurse -ErrorAction SilentlyContinue |
             Where-Object { $_.LastWriteTime -lt $cutoff }
     } else { @() }
 
-    $wuError = $wuSvc -and $wuSvc.Status -notin @('Running','Stopped')
-
+    $wuError  = $wuSvc -and $wuSvc.Status -notin @('Running', 'Stopped')
     $needsFix = $wuError -or ($stuckDl.Count -gt 0)
 
     if (-not $needsFix) {
         Skip "Windows Update: sin descargas atascadas (>7 días) y wuauserv OK"
     } else {
         if ($stuckDl.Count -gt 0) { Info "$($stuckDl.Count) fichero(s) de descarga con más de 7 días" }
-        if ($wuError) { Info "wuauserv en estado: $($wuSvc.Status)" }
+        if ($wuError)              { Info "wuauserv en estado: $($wuSvc.Status)" }
 
-        $svcs = @('wuauserv','bits','cryptsvc','msiserver')
         try {
-            # Parar servicios
-            foreach ($s in $svcs) {
-                $svc = Get-Service -Name $s -ErrorAction SilentlyContinue
-                if ($svc -and $svc.Status -eq 'Running') {
-                    Stop-Service -Name $s -Force -ErrorAction SilentlyContinue
-                }
-            }
+            Stop-Service -Name @('wuauserv', 'bits', 'cryptsvc', 'msiserver') `
+                         -Force -ErrorAction SilentlyContinue
             Start-Sleep -Seconds 3
 
-            # Limpiar SoftwareDistribution\Download
-            $delSd = 0
-            if (Test-Path $sdPath) {
-                Get-ChildItem $sdPath -File -Recurse -ErrorAction SilentlyContinue | ForEach-Object {
-                    Remove-Item $_.FullName -Force -ErrorAction SilentlyContinue
-                    $delSd++
-                }
-            }
+            $delSd = Clear-DirectoryFiles $sdPath  -Recurse
+            $delCr = Clear-DirectoryFiles $cr2Path -Recurse
             if ($delSd -gt 0) { OK "SoftwareDistribution\Download: $delSd fichero(s) eliminado(s)" }
-
-            # Limpiar catroot2 (base de datos de firmas de WU — se regenera automáticamente)
-            $delCr = 0
-            if (Test-Path $cr2Path) {
-                Get-ChildItem $cr2Path -File -Recurse -ErrorAction SilentlyContinue | ForEach-Object {
-                    Remove-Item $_.FullName -Force -ErrorAction SilentlyContinue
-                    $delCr++
-                }
-            }
             if ($delCr -gt 0) { OK "catroot2: $delCr fichero(s) eliminado(s)" }
 
-            # Reiniciar servicios principales
-            foreach ($s in @('bits','cryptsvc','wuauserv')) {
-                $svc = Get-Service -Name $s -ErrorAction SilentlyContinue
-                if ($svc) { Start-Service -Name $s -ErrorAction SilentlyContinue }
-            }
+            Start-Service -Name @('bits', 'cryptsvc', 'wuauserv') -ErrorAction SilentlyContinue
             Start-Sleep -Seconds 3
             $after = (Get-Service 'wuauserv').Status
             if ($after -eq 'Running') { OK "Windows Update reiniciado correctamente" }
@@ -312,49 +283,41 @@ if (Sep 6 "WINDOWS UPDATE — reset del cliente WU") {
 
 # ── 7. WSL / HNS — red virtual ───────────────────────────────────────────────
 if (Sep 7 "WSL / HNS — red virtual de WSL y contenedores") {
-    # Diagnóstico: WSL instalado + HNS en error o adaptador vEthernet (WSL) ausente/caído.
-    # Fix: reiniciar HNS (Host Network Service) — recrea los adaptadores virtuales de
-    # WSL y Docker sin modificar la configuración de red del host.
+    # Fix: reiniciar HNS recrea los adaptadores virtuales de WSL y Docker
+    # sin modificar la configuración de red del host.
     # No ejecuta netsh winsock reset (requeriría reinicio del equipo).
 
-    # Comprobar si WSL está instalado
     $wslExe = Get-Command 'wsl.exe' -ErrorAction SilentlyContinue
     if (-not $wslExe) {
         Skip "WSL: wsl.exe no encontrado — WSL no está instalado"
     } else {
-        $hnsSvc    = Get-Service -Name 'hns' -ErrorAction SilentlyContinue
+        $hnsSvc    = Get-Service -Name 'hns'        -ErrorAction SilentlyContinue
         $wslSvc    = Get-Service -Name 'WslService' -ErrorAction SilentlyContinue
-        $wslEthSvc = Get-Service -Name 'wslinstancesvc' -ErrorAction SilentlyContinue
-
-        # Adaptador virtual de WSL
         $wslAdapter = Get-NetAdapter -Name 'vEthernet (WSL*' -ErrorAction SilentlyContinue |
                       Select-Object -First 1
 
-        $hnsError     = $hnsSvc -and $hnsSvc.Status -ne 'Running'
+        $hnsError      = $hnsSvc -and $hnsSvc.Status -ne 'Running'
         $adapterMissing = -not $wslAdapter
         $adapterDown    = $wslAdapter -and $wslAdapter.Status -ne 'Up'
 
         if (-not $hnsError -and -not $adapterMissing -and -not $adapterDown) {
             Skip "WSL/HNS: sin problemas detectados (HNS activo, adaptador vEthernet OK)"
         } else {
-            if ($hnsError)      { Info "HNS en estado: $($hnsSvc.Status)" }
-            if ($adapterMissing){ Info "Adaptador vEthernet (WSL) no encontrado" }
-            if ($adapterDown)   { Info "Adaptador vEthernet (WSL) en estado: $($wslAdapter.Status)" }
+            if ($hnsError)       { Info "HNS en estado: $($hnsSvc.Status)" }
+            if ($adapterMissing) { Info "Adaptador vEthernet (WSL) no encontrado" }
+            if ($adapterDown)    { Info "Adaptador vEthernet (WSL) en estado: $($wslAdapter.Status)" }
 
-            # Reiniciar HNS — recrea todos los adaptadores virtuales Hyper-V/WSL/Docker
             if ($hnsSvc) {
                 Info "Reiniciando HNS (Host Network Service)..."
                 if (Restart-Svc 'hns' -TimeoutSec 30) { OK "HNS reiniciado" }
                 Start-Sleep -Seconds 5
             }
 
-            # Reiniciar WslService si existe y no está corriendo
             if ($wslSvc -and $wslSvc.Status -ne 'Running') {
                 Info "Reiniciando WslService..."
                 if (Restart-Svc 'WslService') { OK "WslService reiniciado" }
             }
 
-            # Verificar adaptador tras reset
             Start-Sleep -Seconds 5
             $adapterAfter = Get-NetAdapter -Name 'vEthernet (WSL*' -ErrorAction SilentlyContinue |
                             Select-Object -First 1
