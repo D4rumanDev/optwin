@@ -64,7 +64,7 @@ function Test-PwshInstalled {
 }
 
 if (Test-PwshInstalled) {
-    $pwshVer = (& pwsh -NoProfile -Command '$PSVersionTable.PSVersion.ToString()' 2>$null)
+    $pwshVer = & pwsh -NoProfile -NonInteractive -Command '$PSVersionTable.PSVersion.ToString()' 2>&1 | Where-Object { $_ -is [string] } | Select-Object -First 1
     OK "PowerShell 7 presente: v$pwshVer"
 } else {
     Write-Log "PowerShell 7 no detectado — instalando via winget..." "Yellow"

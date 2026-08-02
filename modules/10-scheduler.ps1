@@ -20,7 +20,7 @@ try {
     $existingTask = Get-ScheduledTask -TaskName $taskName -ErrorAction SilentlyContinue
     if ($existingTask) {
         # Detectar si la ruta registrada difiere de la ubicacion actual del script
-        $registeredPath = $existingTask.Actions[0].Arguments -replace '^.*-File\s+"([^"]+)".*$','$1'
+        $registeredPath = if ($existingTask.Actions[0].Arguments -match '-File\s+"([^"]+)"') { $Matches[1] } else { '' }
         $pathChanged    = $registeredPath -ne $MainScriptPath
         $needsUpdate    = $pathChanged -or (-not $existingTask.Settings.StartWhenAvailable)
 
@@ -230,7 +230,7 @@ if ($script:countFail -gt 0) {
 
 # Verificacion final de PowerShell 7
 if (Test-PwshInstalled) {
-    $pwshVerFinal = (& pwsh -NoProfile -Command '$PSVersionTable.PSVersion.ToString()' 2>$null)
+    $pwshVerFinal = & pwsh -NoProfile -NonInteractive -Command '$PSVersionTable.PSVersion.ToString()' 2>&1 | Where-Object { $_ -is [string] } | Select-Object -First 1
     OK "PowerShell 7 verificado al finalizar: v$pwshVerFinal"
 } else {
     Err "PowerShell 7 NO detectado al finalizar — instalar manualmente:"

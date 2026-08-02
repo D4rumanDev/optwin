@@ -198,7 +198,7 @@ if (-not $IsLaptop) {
         bcdedit /set useplatformtick yes    | Out-Null
         bcdedit /set disabledynamictick yes | Out-Null
         bcdedit /set tscsyncpolicy enhanced | Out-Null
-        bcdedit /deletevalue useplatformclock 2>$null | Out-Null
+        bcdedit /deletevalue useplatformclock 2>&1 | Out-Null
         OK "Timer BCD: useplatformtick=yes, disabledynamictick=yes, tscsyncpolicy=enhanced"
     } catch { Err "Timer BCD — $_" }
 } else {

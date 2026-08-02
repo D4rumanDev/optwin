@@ -226,7 +226,11 @@ function Set-SectionApplied([string]$Key, $Data) {
 
 function Read-DataJson {
     param([string]$Path, [string]$Property = "")
-    $data = Get-Content $Path -Raw | ConvertFrom-Json
+    try {
+        $data = Get-Content $Path -Raw -ErrorAction Stop | ConvertFrom-Json
+    } catch {
+        throw "No se puede leer '$([System.IO.Path]::GetFileName($Path))': $_"
+    }
     $result = if ($Property) { $data | Select-Object -ExpandProperty ($Property.TrimStart('.')) } else { $data }
     $result | ForEach-Object {
         if ($_ -is [PSCustomObject]) {

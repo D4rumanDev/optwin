@@ -78,9 +78,11 @@ if (Test-SectionApplied "performance-network-reg" $regNetworkStatic) {
     OK "Red registro: $($regNetworkStatic.Count) claves aplicadas"
 }
 
+# Capturar estado TCP una vez — reutilizado en TCP stack y TCP timestamps
+$tcpState = netsh int tcp show global 2>&1 | Out-String
+
 # Optimizar stack TCP (autotuninglevel, RSS, chimney, ECN)
 try {
-    $tcpState = netsh int tcp show global 2>&1 | Out-String
     $tcpOk = ($tcpState -imatch "Auto-Tuning.*normal") -and
              ($tcpState -imatch "Receive-Side Scaling.*enabled") -and
              ($tcpState -imatch "ECN.*enabled")
@@ -217,8 +219,7 @@ try {
 
 # TCP timestamps: desactiva fingerprinting del uptime del sistema via RFC 1323
 try {
-    $tcpTs = netsh int tcp show global 2>&1 | Out-String
-    if ($tcpTs -imatch "RFC 1323 Timestamps\s*:\s*disabled") {
+    if ($tcpState -imatch "RFC 1323 Timestamps\s*:\s*disabled") {
         Skip "TCP timestamps: ya desactivados"
     } else {
         netsh int tcp set global timestamps=disabled | Out-Null

@@ -56,14 +56,13 @@ if (Test-SectionApplied "tls-schannel" ($regTLS + $regNETFX)) {
 Sep "07.14 RED — WPAD, Zona descarga, Activacion voz, LanmanServer, NoLMHash"
 # ============================================================
 
-$bkTs2 = Get-Date -Format 'yyyyMMdd-HHmmss'
 foreach ($bkEntry in @(
     @{ Key="HKLM\SYSTEM\CurrentControlSet\Control\Lsa";                          Tag="lsa"       },
     @{ Key="HKLM\SYSTEM\CurrentControlSet\Services\LanmanServer\Parameters";     Tag="lanmansrv" }
 )) {
     $psPath = $bkEntry.Key -replace '^HKLM\\','HKLM:\'
     if (Test-Path $psPath) {
-        $bkFile = "$LogsDir\backup-$($bkEntry.Tag)-$bkTs2.reg"
+        $bkFile = "$LogsDir\backup-$($bkEntry.Tag)-$bkTs.reg"
         reg export $bkEntry.Key $bkFile /y 2>&1 | Out-Null
         if (Test-Path $bkFile) { Write-Log "  Backup $($bkEntry.Tag): $([System.IO.Path]::GetFileName($bkFile))" "DarkGray" }
     }
@@ -194,30 +193,19 @@ try {
 Sep "07.8 ASR — Attack Surface Reduction (Windows Defender)"
 # ============================================================
 
-# Reglas elegidas por balance protección/false-positives en entorno developer:
-#   9e6c...4b0  — bloquea robo de credenciales desde LSASS (Mimikatz, etc.)
-#   5beb...801d — bloquea scripts ofuscados (PowerShell/JS malicioso)
-#   be9b...0550 — bloquea ejecutables adjuntos en email
-#   d3e0...596d — bloquea JS/VBS lanzando ejecutables descargados
-#   b2b3...9ba4 — bloquea procesos sin firma desde USB
-$asrRules = @(
-    "9e6c4e1f-7d60-472f-ba1a-a39ef669e4b0",
-    "5beb7efe-fd9a-4556-801d-275e5ffc04cc",
-    "be9ba2d9-53ea-4cdc-84e5-9b1eeee46550",
-    "d3e037e1-3eb8-44c8-a917-57927947596d",
-    "b2b3f03d-6a65-4f7b-a9c7-1c7ef74a9ba4"
-)
-$asrActions = $asrRules | ForEach-Object { "Enabled" }
+$asrData    = Read-DataJson "$PSScriptRoot\..\data\asr-rules.json"
+$asrRuleIds = $asrData | Select-Object -ExpandProperty id
+$asrActions = [string[]] (@('Enabled') * $asrRuleIds.Count)
 
-if (Test-SectionApplied "asr-rules" $asrRules -MaxAgeDays 30) {
-    Skip "ASR: $($asrRules.Count) reglas — sin cambios desde hace <30 dias"
+if (Test-SectionApplied "asr-rules" $asrRuleIds -MaxAgeDays 30) {
+    Skip "ASR: $($asrRuleIds.Count) reglas — sin cambios desde hace <30 dias"
 } else {
     try {
-        Add-MpPreference -AttackSurfaceReductionRules_Ids $asrRules `
+        Add-MpPreference -AttackSurfaceReductionRules_Ids $asrRuleIds `
                          -AttackSurfaceReductionRules_Actions $asrActions `
                          -ErrorAction Stop
-        OK "ASR: $($asrRules.Count) reglas activadas"
-        Set-SectionApplied "asr-rules" $asrRules
+        OK "ASR: $($asrRuleIds.Count) reglas activadas"
+        Set-SectionApplied "asr-rules" $asrRuleIds
     } catch { Err "ASR rules — $_" }
 }
 

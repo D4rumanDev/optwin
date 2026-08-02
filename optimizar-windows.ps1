@@ -62,7 +62,7 @@ if (-not (Test-Path $ModulesDir -PathType Container)) {
 
 # Desbloquear archivos marcados como descargados de internet (Zone.Identifier)
 # Necesario cuando el repo se clona desde GitHub — evita bloqueos de ExecutionPolicy
-Get-ChildItem $PSScriptRoot -Recurse -ErrorAction SilentlyContinue |
+Get-ChildItem $PSScriptRoot -Recurse -Include '*.ps1','*.json' -ErrorAction SilentlyContinue |
     Unblock-File -ErrorAction SilentlyContinue
 
 . "$ModulesDir\00-core.ps1"

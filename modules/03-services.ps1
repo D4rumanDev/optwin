@@ -22,6 +22,8 @@
 # FSM con MaxAgeDays=6: se re-aplica en la ejecucion semanal pero se salta en re-ejecuciones
 # manuales dentro de la misma semana. Windows Update puede resetear servicios, por eso no
 # usamos un umbral mayor.
+Sep "03.1 SERVICIOS — Desactivar"
+
 $svcData = Read-DataJson "$PSScriptRoot\..\data\services.json"
 $svcDisabledList = $svcData.disabled | Select-Object -ExpandProperty name
 $svcSensorMode = if ($IsLaptop) { "Manual" } else { "Disabled" }

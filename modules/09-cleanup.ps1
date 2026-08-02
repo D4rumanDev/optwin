@@ -10,10 +10,9 @@ function Remove-TempFolder {
     param([string]$Path, [string]$Label)
     if (-not (Test-Path $Path)) { Skip "No existe: $Label"; return }
     try {
-        $size = (Get-ChildItem $Path -Recurse -Force -ErrorAction SilentlyContinue |
-                 Measure-Object -Property Length -Sum).Sum
-        Get-ChildItem $Path -Recurse -Force -ErrorAction SilentlyContinue |
-            Remove-Item -Force -Recurse -ErrorAction SilentlyContinue
+        $items = Get-ChildItem $Path -Recurse -Force -ErrorAction SilentlyContinue
+        $size  = ($items | Measure-Object -Property Length -Sum).Sum
+        $items | Remove-Item -Force -Recurse -ErrorAction SilentlyContinue
         $script:freedBytes += $size
         $mb = [math]::Round($size / 1MB, 1)
         OK "Limpiado: $Label ($mb MB liberados)"
@@ -121,7 +120,6 @@ if ($dismWinSxsAge -lt 30) {
 if (Test-Path "C:\Windows.old") {
     $oldSize = (Get-ChildItem "C:\Windows.old" -Recurse -Force -ErrorAction SilentlyContinue |
                 Measure-Object -Property Length -Sum).Sum
-    $script:freedBytes += $oldSize
     OK "Windows.old detectado ($([math]::Round($oldSize/1GB,1)) GB) — eliminacion delegada a cleanmgr (job en background)"
 } else {
     Skip "Windows.old no existe"

@@ -235,24 +235,9 @@ Sep "08.3 TAREAS PROGRAMADAS XBOX — Deshabilitar"
 # ============================================================
 
 @(
-    @{ Path = "\Microsoft\XblGameSave\"; Name = "XblGameSaveTask" },
-    @{ Path = "\Microsoft\XblGameSave\"; Name = "XblGameSaveTaskLogon" }
-) | ForEach-Object {
-    $t = $_
-    try {
-        $task = Get-ScheduledTask -TaskPath $t.Path -TaskName $t.Name -ErrorAction SilentlyContinue
-        if (-not $task) {
-            Skip "Tarea no encontrada: $($t.Path)$($t.Name)"
-        } elseif ($task.State -eq "Disabled") {
-            Skip "Tarea ya deshabilitada: $($t.Path)$($t.Name)"
-        } else {
-            Disable-ScheduledTask -TaskPath $t.Path -TaskName $t.Name -ErrorAction Stop | Out-Null
-            OK "Tarea deshabilitada: $($t.Path)$($t.Name)"
-        }
-    } catch {
-        Err "Tarea $($t.Path)$($t.Name) — $_"
-    }
-}
+    "\Microsoft\XblGameSave\XblGameSaveTask",
+    "\Microsoft\XblGameSave\XblGameSaveTaskLogon"
+) | ForEach-Object { Disable-Task $_ }
 
 # Carpeta \Microsoft\Xbox\ — captura todas las tareas que pueda haber
 try {
@@ -319,7 +304,7 @@ if (-not (Get-Command winget -ErrorAction SilentlyContinue)) {
         # Buscar el ID en la salida (no depende del idioma del sistema)
         if (-not ($check | Select-String ([regex]::Escape($app.id)))) {
             Write-Log "Instalando: $($app.name)..." "Yellow"
-            $result = winget install --id $app.id --exact --silent `
+            $result = & $wingetExe install --id $app.id --exact --silent `
                 --accept-source-agreements --accept-package-agreements 2>&1
             if ($LASTEXITCODE -eq 0) {
                 OK "Instalado: $($app.name)"
