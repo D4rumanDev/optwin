@@ -70,8 +70,15 @@ function Reset-PnpDevice {
         Disable-PnpDevice -InstanceId $InstanceId -Confirm:$false -ErrorAction Stop
         Start-Sleep -Seconds $DisableSleep
         Enable-PnpDevice  -InstanceId $InstanceId -Confirm:$false -ErrorAction Stop
-        Start-Sleep -Seconds $EnableSleep
-        return (Get-PnpDevice -InstanceId $InstanceId -ErrorAction SilentlyContinue).Status
+        # Poll hasta que el driver complete la inicialización — drivers lentos pueden
+        # reportar transitoriamente un estado distinto de OK/Error durante el arranque.
+        $deadline = (Get-Date).AddSeconds($EnableSleep + 7)
+        $status   = $null
+        do {
+            Start-Sleep -Milliseconds 500
+            $status = (Get-PnpDevice -InstanceId $InstanceId -ErrorAction SilentlyContinue).Status
+        } while ($status -notin @('OK', 'Error') -and (Get-Date) -lt $deadline)
+        return $status
     } catch {
         Err "Reset PnP fallido: $Label — $_"
         return $null
@@ -83,12 +90,16 @@ function Clear-DirectoryFiles {
     param([string]$Path, [switch]$Recurse)
     if (-not (Test-Path $Path)) { return 0 }
     $deleted = 0
+    $failed  = 0
     Get-ChildItem $Path -File -Recurse:$Recurse -ErrorAction SilentlyContinue | ForEach-Object {
         try {
             Remove-Item $_.FullName -Force -ErrorAction Stop
             $deleted++
-        } catch {}
+        } catch {
+            $failed++
+        }
     }
+    if ($failed -gt 0) { Info "Advertencia: $failed fichero(s) en uso o sin permisos, no eliminados" }
     return $deleted
 }
 
