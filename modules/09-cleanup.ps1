@@ -149,3 +149,33 @@ if (-not $bleachbitExe) {
         Err "BleachBit: $_"
     }
 }
+
+# ============================================================
+Sep "09.3 DISPOSITIVOS USB FANTASMA"
+# ============================================================
+# Elimina entradas de dispositivos USB que Windows tiene registrados pero que
+# ya no están físicamente conectados (status Unknown). Se reinstalan solos al
+# volver a enchufarse. Evita errores de "Se sobrepasó la capacidad del puerto
+# USB" causados por entradas zombie que confunden la contabilidad de energía.
+
+$usbGhosts = Get-PnpDevice -Class USB -ErrorAction SilentlyContinue |
+             Where-Object { $_.Status -eq 'Unknown' }
+
+if (-not $usbGhosts) {
+    Skip "Dispositivos USB fantasma: ninguno encontrado"
+} else {
+    $removed = 0
+    $failed  = 0
+    foreach ($dev in $usbGhosts) {
+        $result = pnputil /remove-device "$($dev.InstanceId)" 2>&1
+        if ($LASTEXITCODE -eq 0) {
+            $removed++
+            Write-Log "  Eliminado: $($dev.FriendlyName) [$($dev.InstanceId)]" "DarkGray"
+        } else {
+            $failed++
+            Write-Log "  No eliminado: $($dev.FriendlyName) — $result" "Yellow"
+        }
+    }
+    if ($removed -gt 0) { OK "Dispositivos USB fantasma eliminados: $removed" }
+    if ($failed  -gt 0) { Err "Dispositivos USB fantasma no eliminados: $failed" }
+}

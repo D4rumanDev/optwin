@@ -18,7 +18,7 @@ $script:BackupEntries  = [System.Collections.Generic.List[hashtable]]::new()
 function Write-Log {
     param([string]$msg, [string]$color = "White")
     $line = "[$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')] $msg"
-    Add-Content -Path $LogFile -Value $line -Encoding UTF8 -ErrorAction SilentlyContinue
+    try { Add-Content -Path $LogFile -Value $line -Encoding UTF8 -ErrorAction Stop } catch {}
     Write-Host $msg -ForegroundColor $color
 }
 function OK($msg)  { $script:countOK++;   Write-Log "[OK]   $msg" "Green"  }
@@ -194,8 +194,17 @@ function Get-StateHash($Data) {
 }
 
 function Save-AppState {
-    $script:AppState | ConvertTo-Json -Depth 3 |
-        Set-Content $script:StateFile -Encoding UTF8 -NoNewline -ErrorAction SilentlyContinue
+    $json = $script:AppState | ConvertTo-Json -Depth 3
+    $attempts = 3
+    while ($attempts -gt 0) {
+        try {
+            Set-Content $script:StateFile -Value $json -Encoding UTF8 -NoNewline -ErrorAction Stop
+            return
+        } catch {
+            $attempts--
+            if ($attempts -gt 0) { Start-Sleep -Milliseconds 150 }
+        }
+    }
 }
 
 function Test-SectionApplied([string]$Key, $Data, [int]$MaxAgeDays = 0) {
