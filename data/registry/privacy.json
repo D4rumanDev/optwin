@@ -186,5 +186,7 @@
   {"P": "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\CrashControl", "N": "DisplayParameters", "V": 1},
   {"P": "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\CrashControl", "N": "DisableEmoticon",   "V": 1},
   {"P": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\WorkplaceJoin", "N": "BlockAADWorkplaceJoin", "V": 1},
-  {"P": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\CloudContent", "N": "DisableConsumerAccountStateContent", "V": 1}
+  {"P": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\CloudContent", "N": "DisableConsumerAccountStateContent", "V": 1},
+  {"P": "HKCU:\\Software\\Policies\\Microsoft\\Windows\\WindowsCopilot",  "N": "TurnOffWindowsCopilot", "V": 1},
+  {"P": "HKLM:\\Software\\Policies\\Microsoft\\Windows\\WindowsCopilot",  "N": "TurnOffWindowsCopilot", "V": 1}
 ]

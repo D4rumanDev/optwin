@@ -149,23 +149,21 @@ if (-not $bleachbitExe) {
 }
 
 # ============================================================
-Sep "09.3 DISPOSITIVOS USB FANTASMA"
+Sep "09.3 DISPOSITIVOS USB Y BLUETOOTH FANTASMA"
 # ============================================================
-# Elimina entradas de dispositivos USB que Windows tiene registrados pero que
-# ya no están físicamente conectados (status Unknown). Se reinstalan solos al
-# volver a enchufarse. Evita errores de "Se sobrepasó la capacidad del puerto
-# USB" causados por entradas zombie que confunden la contabilidad de energía.
+# Elimina entradas de dispositivos USB y Bluetooth LE que Windows tiene
+# registrados pero que ya no están conectados (status Unknown).
+# Se reinstalan solos al volver a enchufarse/emparejarse.
+# USB: evita errores de "Se sobrepasó la capacidad del puerto USB".
+# BT LE: evita que emparejamientos duplicados bloqueen la reconexión.
 
-$usbGhosts = Get-PnpDevice -Class USB -ErrorAction SilentlyContinue |
-             Where-Object { $_.Status -eq 'Unknown' }
-
-if (-not $usbGhosts) {
-    Skip "Dispositivos USB fantasma: ninguno encontrado"
-} else {
+function Remove-GhostDevices {
+    param([string]$Label, $Devices)
+    if (-not $Devices) { Skip "$Label fantasma: ninguno encontrado"; return }
     $removed = 0
     $failed  = 0
-    foreach ($dev in $usbGhosts) {
-        $result = pnputil /remove-device "$($dev.InstanceId)" 2>&1
+    foreach ($dev in $Devices) {
+        $result = & pnputil /remove-device $dev.InstanceId 2>&1
         if ($LASTEXITCODE -eq 0) {
             $removed++
             Write-Log "  Eliminado: $($dev.FriendlyName) [$($dev.InstanceId)]" "DarkGray"
@@ -174,6 +172,67 @@ if (-not $usbGhosts) {
             Write-Log "  No eliminado: $($dev.FriendlyName) — $result" "Yellow"
         }
     }
-    if ($removed -gt 0) { OK "Dispositivos USB fantasma eliminados: $removed" }
-    if ($failed  -gt 0) { Err "Dispositivos USB fantasma no eliminados: $failed" }
+    if ($removed -gt 0) { OK "$Label fantasma eliminados: $removed" }
+    if ($failed  -gt 0) { Err "$Label fantasma no eliminados: $failed" }
+}
+
+$usbGhosts = Get-PnpDevice -Class USB -ErrorAction SilentlyContinue |
+             Where-Object { $_.Status -eq 'Unknown' }
+Remove-GhostDevices "Dispositivos USB" $usbGhosts
+
+# BT LE: clases BTHLEDevice y BTHLE — solo los nodos raíz (BTHLE\DEV_*)
+# para no eliminar servicios hijos de dispositivos activos
+$bthleGhosts = Get-PnpDevice -ErrorAction SilentlyContinue |
+               Where-Object { $_.Status -eq 'Unknown' -and $_.InstanceId -match '^BTHLE\\DEV_' }
+Remove-GhostDevices "Dispositivos Bluetooth LE" $bthleGhosts
+
+# ============================================================
+Sep "09.4 USB POWER MANAGEMENT — anti-overcurrent"
+# ============================================================
+# Dispositivos USB 2.0 con consumo declarado cercano al límite de 500 mA
+# pueden disparar "Se sobrepasó la capacidad del puerto USB" si Windows
+# Update reactiva USB selective suspend o el power management de los hubs.
+# Esta sección restaura los ajustes necesarios de forma idempotente.
+
+# 1. USB Selective Suspend — deshabilitar en plan activo (AC + DC)
+$guidUsb = "2a737441-1930-4402-8d77-b2bebba308a3"
+$guidSs  = "48e6b7a6-50f5-4782-a5d4-53bb8f07e226"
+& powercfg /setacvalueindex SCHEME_CURRENT $guidUsb $guidSs 0 2>&1 | Out-Null; $acOk = $LASTEXITCODE -eq 0
+& powercfg /setdcvalueindex SCHEME_CURRENT $guidUsb $guidSs 0 2>&1 | Out-Null; $dcOk = $LASTEXITCODE -eq 0
+& powercfg /setactive SCHEME_CURRENT 2>&1 | Out-Null;                          $apOk = $LASTEXITCODE -eq 0
+if ($acOk -and $dcOk -and $apOk) { OK "USB Selective Suspend: deshabilitado (AC + DC)" }
+else                              { Err "USB Selective Suspend: powercfg falló (AC=$acOk DC=$dcOk apply=$apOk)" }
+
+# 2. Root Hub EnhancedPowerManagement — deshabilitar en todos los concentradores raíz
+$hubs = Get-PnpDevice | Where-Object {
+    $_.Status -eq 'OK' -and $_.InstanceId -match '^USB\\ROOT_HUB'
+}
+$hubCount = 0
+foreach ($hub in $hubs) {
+    $rp = "HKLM:\SYSTEM\CurrentControlSet\Enum\$($hub.InstanceId)\Device Parameters"
+    if (Test-Path $rp) {
+        Set-ItemProperty -Path $rp -Name "EnhancedPowerManagementEnabled" -Value 0 -Type DWord -Force
+        $hubCount++
+    }
+}
+if ($hubCount -gt 0) { OK "Root Hub EnhancedPowerManagementEnabled=0: $hubCount hubs" }
+else                 { Skip "Root Hub: ningún concentrador raíz encontrado" }
+
+# 3. xHCI AMD (VEN_1022 DEV_15C0) — deshabilitar D3/idle
+# Aplica solo si el controlador está presente; no actúa en hardware distinto.
+$xhciEntry = Get-ChildItem "HKLM:\SYSTEM\CurrentControlSet\Enum\PCI" -ErrorAction SilentlyContinue |
+             Where-Object { $_.PSChildName -match 'VEN_1022&DEV_15C0' } |
+             ForEach-Object { Get-ChildItem $_.PSPath -ErrorAction SilentlyContinue } |
+             Select-Object -First 1
+
+if ($xhciEntry) {
+    $dp  = Join-Path $xhciEntry.PSPath "Device Parameters"
+    $wdf = Join-Path $dp "WDF"
+    New-Item -Path $wdf -Force -ErrorAction SilentlyContinue | Out-Null
+    Set-ItemProperty -Path $wdf -Name "IdleInD3"                 -Value 0 -Type DWord -Force
+    Set-ItemProperty -Path $dp  -Name "D3ColdSupported"           -Value 0 -Type DWord -Force
+    Set-ItemProperty -Path $dp  -Name "EnableIdlePowerManagement" -Value 0 -Type DWord -Force
+    OK "xHCI VEN_1022 DEV_15C0: IdleInD3=0, D3ColdSupported=0, EnableIdlePowerManagement=0"
+} else {
+    Skip "xHCI VEN_1022 DEV_15C0: no presente en este equipo"
 }

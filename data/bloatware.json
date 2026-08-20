@@ -100,7 +100,8 @@
       "Microsoft.DevHome",
       "Microsoft.MicrosoftPowerBIForWindows",
       "microsoft.windowscommunicationsapps",
-      "Microsoft.Whiteboard"
+      "Microsoft.Whiteboard",
+      "MicrosoftWindows.Client.WebExperience"
     ]
   },
   "wildcards": [
@@ -113,6 +114,7 @@
     "*DisneyMagicKingdoms*",
     "*RoyalRevolt*",
     "*SpeedTest*",
-    "*Dolby*"
+    "*Dolby*",
+    "*Copilot*"
   ]
 }
