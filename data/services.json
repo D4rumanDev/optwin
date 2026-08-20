@@ -7,7 +7,16 @@
     {"name": "XblGameSave",            "comment": "Xbox Live Game Save"},
     {"name": "XboxNetApiSvc",          "comment": "Xbox Live Networking"},
     {"name": "Fax",                    "comment": "Servicio de fax"},
-    {"name": "NvTelemetryContainer",   "comment": "Telemetria NVIDIA"}
+    {"name": "NvTelemetryContainer",   "comment": "Telemetria NVIDIA"},
+    {"name": "lfsvc",                  "comment": "Geolocalización (Location Service)"},
+    {"name": "CscService",             "comment": "Offline Files / Sync Center"},
+    {"name": "SharedAccess",           "comment": "Internet Connection Sharing"},
+    {"name": "WinRM",                  "comment": "Windows Remote Management (vector de ataque remoto)"},
+    {"name": "CDPSvc",                 "comment": "Connected Devices Platform (telemetría)"},
+    {"name": "WerSvc",                 "comment": "Windows Error Reporting"},
+    {"name": "wisvc",                  "comment": "Windows Insider Service"},
+    {"name": "PhoneSvc",               "comment": "Phone Link"},
+    {"name": "WSAIFabricSvc",          "comment": "AI Fabric Service"}
   ],
   "manual": [
     {"name": "edgeupdate",             "comment": "Microsoft Edge Update"},

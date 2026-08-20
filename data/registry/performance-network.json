@@ -4,5 +4,6 @@
   {"P": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\Tcpip\\Parameters",  "N": "TCPDelAckTicks",     "V": 0},
   {"P": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\Tcpip\\Parameters",  "N": "Tcp1323Opts",        "V": 1},
   {"P": "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile", "N": "NetworkThrottlingIndex", "V": -1},
-  {"P": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\Psched",                            "N": "NonBestEffortLimit",     "V": 0}
+  {"P": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\Psched",                            "N": "NonBestEffortLimit",     "V": 0},
+  {"P": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\LanmanWorkstation\\Parameters",        "N": "DisableBandwidthThrottling", "V": 1}
 ]

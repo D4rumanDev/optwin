@@ -101,7 +101,8 @@
       "Microsoft.MicrosoftPowerBIForWindows",
       "microsoft.windowscommunicationsapps",
       "Microsoft.Whiteboard",
-      "MicrosoftWindows.Client.WebExperience"
+      "MicrosoftWindows.Client.WebExperience",
+      "MicrosoftCorporationII.MicrosoftFamily"
     ]
   },
   "wildcards": [
