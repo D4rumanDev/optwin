@@ -1,6 +1,8 @@
 Set-StrictMode -Off
 $ErrorActionPreference = "Continue"  # Mostrar errores en lugar de silenciarlos — usar -EA SilentlyContinue casos específicos
 
+. "$PSScriptRoot\00-helpers.ps1"
+
 # ── Contadores ────────────────────────────────────────────────
 $script:countOK   = 0
 $script:countFail = 0
@@ -14,13 +16,6 @@ $LogFile = "$LogsDir\optimizar-windows.log"
 $script:BackupJsonFile = "$LogsDir\registry-backup-$(Get-Date -Format 'yyyy-MM-dd-HHmmss').json"
 $script:BackupEntries  = [System.Collections.Generic.List[hashtable]]::new()
 
-# ── Log a archivo y consola ───────────────────────────────────
-function Write-Log {
-    param([string]$msg, [string]$color = "White")
-    $line = "[$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')] $msg"
-    try { Add-Content -Path $LogFile -Value $line -Encoding UTF8 -ErrorAction Stop } catch {}
-    Write-Host $msg -ForegroundColor $color
-}
 function OK($msg)  { $script:countOK++;   Write-Log "[OK]   $msg" "Green"  }
 function Err($msg) { $script:countFail++; Write-Log "[FAIL] $msg" "Red"    }
 function Skip($msg){ $script:countSkip++; Write-Log "[SKIP] $msg" "DarkGray" }

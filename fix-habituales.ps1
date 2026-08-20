@@ -29,18 +29,23 @@ param(
 
 $ErrorActionPreference = "Continue"
 
+$LogsDir = Join-Path $PSScriptRoot "logs"
+New-Item -ItemType Directory -Path $LogsDir -Force -ErrorAction SilentlyContinue | Out-Null
+$LogFile = "$LogsDir\fix-habituales-$(Get-Date -Format 'yyyy-MM-dd-HHmmss').log"
+
+. "$PSScriptRoot\modules\00-helpers.ps1"
+
 # ── Helpers ──────────────────────────────────────────────────────────────────
-function Write-Fix { param($msg, $color = "White") Write-Host $msg -ForegroundColor $color }
-function OK($msg)   { Write-Fix "[OK]   $msg" "Green" }
-function Err($msg)  { Write-Fix "[FAIL] $msg" "Red" }
-function Skip($msg) { Write-Fix "[SKIP] $msg" "DarkGray" }
-function Info($msg) { Write-Fix "  $msg" "Yellow" }
+function OK($msg)   { Write-Log "[OK]   $msg" "Green" }
+function Err($msg)  { Write-Log "[FAIL] $msg" "Red" }
+function Skip($msg) { Write-Log "[SKIP] $msg" "DarkGray" }
+function Info($msg) { Write-Log "  $msg" "Yellow" }
 function Sep($num, $msg) {
     if ($num -notin $script:Sections) { return $false }
     $line = "=" * 60
-    Write-Fix "`n$line" "Cyan"
-    Write-Fix "  $num. $msg" "Cyan"
-    Write-Fix $line "Cyan"
+    Write-Log "`n$line" "Cyan"
+    Write-Log "  $num. $msg" "Cyan"
+    Write-Log $line "Cyan"
     return $true
 }
 
@@ -188,7 +193,7 @@ if (Sep 4 "SIM / WWAN — detección y reset") {
             Skip "SIM/WWAN: no se detectan adaptadores celulares"
         } else {
             foreach ($dev in $allWwan) {
-                Write-Fix "  Adaptador: $($dev.FriendlyName) — Status: $($dev.Status)" "White"
+                Write-Log "  Adaptador: $($dev.FriendlyName) — Status: $($dev.Status)" "White"
             }
 
             $wwanErrors = $allWwan | Where-Object { $_.Status -eq 'Error' }
@@ -347,6 +352,6 @@ if (Sep 7 "WSL / HNS — red virtual de WSL y contenedores") {
 
 # ── Resumen ──────────────────────────────────────────────────────────────────
 $line = "=" * 60
-Write-Fix "`n$line" "Cyan"
-Write-Fix "  Completado. Revisa los [FAIL] si los hay." "Cyan"
-Write-Fix "$line`n" "Cyan"
+Write-Log "`n$line" "Cyan"
+Write-Log "  Completado. Revisa los [FAIL] si los hay." "Cyan"
+Write-Log "$line`n" "Cyan"
