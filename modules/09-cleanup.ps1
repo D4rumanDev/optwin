@@ -236,3 +236,61 @@ if ($xhciEntry) {
 } else {
     Skip "xHCI VEN_1022 DEV_15C0: no presente en este equipo"
 }
+
+# ============================================================
+Sep "09.5 REGISTRO — Historial de actividad"
+# ============================================================
+# Borra claves de registro que acumulan historial de actividad del usuario.
+# Los módulos anteriores ya aplican valores de configuración permanente;
+# esta sección elimina el historial acumulado hasta el momento de ejecución.
+# Donde Windows requiere que la clave exista, se recrea vacía (-Recreate).
+
+function Remove-HistoryKey {
+    param([string]$Path, [string]$Label, [switch]$Recreate)
+    if (-not (Test-Path $Path)) { Skip "No existe: $Label"; return }
+    try {
+        Remove-Item -Path $Path -Recurse -Force -ErrorAction Stop
+        if ($Recreate) { New-Item -Path $Path -Force -ErrorAction SilentlyContinue | Out-Null }
+        OK "Historial borrado: $Label"
+    } catch {
+        Err "Error borrando $Label — $_"
+    }
+}
+
+$historyKeys = @(
+    @{ P = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\RecentDocs";                  L = "Documentos recientes (Explorer)";          R = $true  },
+    @{ P = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\TypedPaths";                  L = "Rutas escritas en barra de Explorer";      R = $true  },
+    @{ P = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\RunMRU";                      L = "Historial de Ejecutar (Win+R)";             R = $true  },
+    @{ P = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\WordWheelQuery";              L = "Historial de búsqueda en Explorer";         R = $true  },
+    @{ P = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\SearchHistory";               L = "Historial de búsqueda (SearchHistory)";    R = $false },
+    @{ P = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Map Network Drive MRU";       L = "Historial de unidades de red conectadas";  R = $false },
+    @{ P = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\ComDlg32\OpenSaveMRU";        L = "Historial de diálogos Abrir/Guardar";      R = $false },
+    @{ P = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\ComDlg32\OpenSavePidlMRU";    L = "Historial PIDL de diálogos";               R = $false },
+    @{ P = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\ComDlg32\LastVisitedMRU";     L = "Última carpeta visitada (diálogos)";       R = $false },
+    @{ P = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\ComDlg32\LastVisitedPidlMRU"; L = "Última carpeta PIDL visitada (diálogos)";  R = $false },
+    @{ P = "HKCU:\Software\Microsoft\Windows\Shell\Copilot\BingChat";                              L = "Historial de Copilot / Bing Chat";          R = $false }
+)
+
+foreach ($k in $historyKeys) {
+    Remove-HistoryKey -Path $k.P -Label $k.L -Recreate:($k.R -eq $true)
+}
+
+# UserAssist: subclaves GUID con seguimiento de frecuencia de lanzamiento de apps.
+# Se borran los registros internos (Count) pero se conserva la estructura de claves
+# para que Windows no pierda la capacidad de escribir en UserAssist.
+$uaPath = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\UserAssist"
+if (Test-Path $uaPath) {
+    $cleared = 0
+    Get-ChildItem $uaPath -ErrorAction SilentlyContinue | ForEach-Object {
+        $countKey = Join-Path $_.PSPath "Count"
+        if (Test-Path $countKey) {
+            Remove-Item -Path $countKey -Recurse -Force -ErrorAction SilentlyContinue
+            New-Item   -Path $countKey -Force         -ErrorAction SilentlyContinue | Out-Null
+            $cleared++
+        }
+    }
+    if ($cleared -gt 0) { OK "UserAssist: $cleared registros de seguimiento de apps eliminados" }
+    else                 { Skip "UserAssist: sin datos de seguimiento acumulado" }
+} else {
+    Skip "UserAssist: clave no existe"
+}
