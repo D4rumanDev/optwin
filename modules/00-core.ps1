@@ -166,7 +166,7 @@ function Disable-Task {
     } catch {
         # Fallback: schtasks.exe funciona con tareas protegidas donde PS falla
         $tnArg = ($dir.TrimEnd('\') + '\' + $leaf) -replace '\\\\','\'
-        $result = & schtasks.exe /Change /TN $tnArg /Disable 2>&1
+        $result = & schtasks.exe /Change /TN "$tnArg" /Disable 2>&1
         if ($LASTEXITCODE -eq 0) {
             OK "Tarea desactivada (schtasks): $FullPath"
         } else {
