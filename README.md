@@ -102,6 +102,59 @@ logs/
   backup-lanmansrv-{ts}.reg      — LanmanServer subtree export
 ```
 
+## Changelog
+
+### 2026-08-20 — systematic source-repo audit
+
+**Registry data files — ~120 new entries across 6 files**
+
+`privacy.json`:
+- Windows AI agent controls: `DisableSettingsAgent`, `DisableAgentConnectors`, `DisableAgentWorkspaces`, `AllowCopilotRuntime=0` (`HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsAI`)
+- AppPrivacy GPO block for newer capabilities: `LetAppsAccessMotion=2`, `LetAppsActivateWithVoice=2`, `LetAppsAccessGenerativeAI=2`, `LetAppsAccessSystemAIModels=2`
+- Copilot Shell controls: `IsCopilotAvailable=0`, `IsUserEligible=0` (BingChat), `ShowCopilotNudges=0`
+- Additional ConsentStore deny: `activity`, `email`, `userDataTasks`, `radios` (HKCU + HKLM)
+- Autorun/Autoplay block: `NoDriveTypeAutoRun=255`, `NoAutorun=1`, `NoAutoplayfornonVolume=1`
+- Recent docs: `NoRecentDocsHistory=1` (HKLM), `ClearRecentDocsOnExit=1` (HKCU)
+- SettingSync disable: `DisableSettingSync=2`, `DisableSettingSyncUserOverride=1`
+- InputPersonalization policies: `RestrictImplicitInkCollection` / `RestrictImplicitTextCollection` (HKCU + HKLM under `Policies`)
+- Maps: `AutoDownloadAndUpdateMapData=0`, `AllowUntriggeredNetworkTrafficOnSettingsPage=0`
+- HTTP language fingerprint opt-out: `HttpAcceptLanguageOptOut=1` (`HKCU:\Control Panel\International\User Profile`)
+
+`telemetry-windows.json`:
+- Extended Cortana block: PolicyManager `AllowCortana value=0`, `CortanaEnabled` / `CanCortanaBeEnabled` / `CortanaConsent` (HKCU paths), `AllowCortanaAboveLock`
+- Windows Insider / Preview Builds: `EnableExperimentation=0`, `EnableConfigFlighting=0`, `AllowBuildPreview=0`, `HideInsiderPage=1`
+- WER consent overrides: `DefaultConsent=0`, `DefaultOverrideBehavior=1`, `DontSendAdditionalData=1`, `LoggingDisabled=1`
+- Defender reporting: `DisableGenericReports=1`, `LocalSettingOverrideSpynetReporting=0`
+- CPSS Store: `AdvertisingInfo`, `InkingAndTypingPersonalization`, `ImproveInkingAndTyping` set to 0
+- SearchSettings: `IsMSACloudSearchEnabled=0`, `IsAADCloudSearchEnabled=0`
+- Additional: `MaxTelemetryAllowed=0` (HKCU), `LimitEnhancedDiagnosticDataWindowsAnalytics=0`, DiagTrack `ShowedToastAtLevel=1`, `InsightsEnabled=0`
+
+`telemetry-office.json`:
+- `controllerconnectedservicesenabled=2` (`HKCU:\Software\Policies\Microsoft\office\16.0\common\privacy`)
+- OneNote Copilot controls: `EnableCopilotNotebooks=0`, `EnableCopilotSkittle=0`
+
+`edge.json`:
+- Edge AI policy block: `Microsoft365CopilotChatIconEnabled=0`, `BuiltInAIAPIsEnabled=0`, `AIGenThemesEnabled=0`, `DevToolsGenAiSettings=2`, `ShareBrowsingHistoryWithCopilotSearchAllowed=0`
+
+`interface-win11debloat.json`:
+- Hibernate: `HibernateEnabled=0` (Power), `ShowHibernateOption=0` (FlyoutMenuSettings)
+- Lock screen notifications: `DisableLockScreenAppNotifications=1`
+- Tile push notifications: `NoTileApplicationNotification=1`
+- ContentDelivery master switches: `ContentDeliveryAllowed=0`, `SubscribedContentEnabled=0`, `FeatureManagementEnabled=0`, `PreInstalledAppsEverEnabled=0`, `RotatingLockScreenEnabled=0`
+
+`performance-network.json`:
+- SMB client cache tuning: `FileInfoCacheEntriesMax=1024`, `DirectoryCacheEntriesMax=1024`, `FileNotFoundCacheEntriesMax=2048` (LanmanWorkstation)
+- SMB server stack: `IRPStackSize=20` (LanmanServer)
+
+**Module 09 — new section `09.5 REGISTRO — Historial de actividad`**
+
+Clears accumulated activity history from 11 Explorer registry keys:
+`RecentDocs`, `TypedPaths`, `RunMRU`, `WordWheelQuery`, `SearchHistory`, Map Network Drive MRU, `ComDlg32` Open/Save/LastVisited (MRU + PIDL variants), Copilot/BingChat history.
+
+Clears `UserAssist\{GUID}\Count` subkeys (tracks app launch frequency) while preserving the GUID parent structure so Windows can continue writing there.
+
+Keys Windows requires to exist are recreated empty after deletion (`-Recreate`). Implementation follows the privacy-sexy `Remove-Item` pattern — complements the permanent value-setting approach of modules 04/06/07 by clearing history accumulated before first run.
+
 ## Sources / inspiration
 
 - [ChrisTitusTech/winutil](https://github.com/ChrisTitusTech/winutil) — tweaks.json
