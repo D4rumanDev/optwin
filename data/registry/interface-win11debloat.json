@@ -63,5 +63,9 @@
   {"P": "HKCU:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Notifications\\Settings\\PowerToys", "N": "Enabled", "V": 0},
   {"P": "HKCU:\\Software\\Classes\\CLSID\\{f874310e-b6b7-47dc-bc84-b9e6b38f5903}", "N": "System.IsPinnedToNameSpaceTree", "V": 0},
   {"P": "HKCU:\\Software\\Classes\\CLSID\\{e88865ea-0e1c-4e20-9aa6-edcd0212c87c}", "N": "System.IsPinnedToNameSpaceTree", "V": 0},
-  {"P": "HKCU:\\SOFTWARE\\Microsoft\\Office\\16.0\\Outlook\\Preferences",           "N": "UseNewOutlook",                  "V": 0}
+  {"P": "HKCU:\\SOFTWARE\\Microsoft\\Office\\16.0\\Outlook\\Preferences",           "N": "UseNewOutlook",                  "V": 0},
+  {"P": "HKLM:\\System\\CurrentControlSet\\Control\\Session Manager\\Power",        "N": "HibernateEnabled",                "V": 0},
+  {"P": "HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FlyoutMenuSettings", "N": "ShowHibernateOption",      "V": 0},
+  {"P": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\System",                    "N": "DisableLockScreenAppNotifications","V": 1},
+  {"P": "HKCU:\\SOFTWARE\\Policies\\Microsoft\\Windows\\CurrentVersion\\PushNotifications", "N": "NoTileApplicationNotification", "V": 1}
 ]

@@ -34,5 +34,22 @@
   {"P": "HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\CapabilityAccessManager\\ConsentStore\\location", "N": "Value", "V": "Deny", "T": "String"},
   {"P": "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Sensor\\Overrides\\{BFA794E4-F964-4FDB-90F6-51056BFE4B44}", "N": "SensorPermissionState", "V": 0},
   {"P": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\lfsvc\\Service\\Configuration", "N": "Status",           "V": 0},
-  {"P": "HKLM:\\SYSTEM\\Maps",                                                     "N": "AutoUpdateEnabled",                            "V": 0}
+  {"P": "HKLM:\\SYSTEM\\Maps",                                                     "N": "AutoUpdateEnabled",                            "V": 0},
+  {"P": "HKLM:\\SOFTWARE\\Microsoft\\PolicyManager\\default\\Experience\\AllowCortana", "N": "value",              "V": 0},
+  {"P": "HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Search",              "N": "CortanaEnabled",          "V": 0},
+  {"P": "HKCU:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Search",              "N": "CortanaEnabled",          "V": 0},
+  {"P": "HKCU:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Search",              "N": "CanCortanaBeEnabled",     "V": 0},
+  {"P": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Search",              "N": "CortanaConsent",          "V": 0},
+  {"P": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\Windows Search",            "N": "AllowCortanaAboveLock",   "V": 0},
+  {"P": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\PreviewBuilds",             "N": "EnableExperimentation",   "V": 0},
+  {"P": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\PreviewBuilds",             "N": "EnableConfigFlighting",   "V": 0},
+  {"P": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\PreviewBuilds",             "N": "AllowBuildPreview",       "V": 0},
+  {"P": "HKLM:\\SOFTWARE\\Microsoft\\WindowsSelfHost\\UI\\Visibility",              "N": "HideInsiderPage",         "V": 1},
+  {"P": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\DataCollection",            "N": "LimitEnhancedDiagnosticDataWindowsAnalytics", "V": 0},
+  {"P": "HKLM:\\Software\\Microsoft\\Windows\\Windows Error Reporting\\Consent",   "N": "DefaultConsent",          "V": 0},
+  {"P": "HKLM:\\Software\\Microsoft\\Windows\\Windows Error Reporting\\Consent",   "N": "DefaultOverrideBehavior", "V": 1},
+  {"P": "HKLM:\\Software\\Microsoft\\Windows\\Windows Error Reporting",            "N": "DontSendAdditionalData",  "V": 1},
+  {"P": "HKLM:\\Software\\Microsoft\\Windows\\Windows Error Reporting",            "N": "LoggingDisabled",         "V": 1},
+  {"P": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows Defender\\Reporting",       "N": "DisableGenericReports",              "V": 1},
+  {"P": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows Defender\\Spynet",          "N": "LocalSettingOverrideSpynetReporting", "V": 0}
 ]

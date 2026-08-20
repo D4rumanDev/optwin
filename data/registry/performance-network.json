@@ -5,5 +5,9 @@
   {"P": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\Tcpip\\Parameters",  "N": "Tcp1323Opts",        "V": 1},
   {"P": "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile", "N": "NetworkThrottlingIndex", "V": -1},
   {"P": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\Psched",                            "N": "NonBestEffortLimit",     "V": 0},
-  {"P": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\LanmanWorkstation\\Parameters",        "N": "DisableBandwidthThrottling", "V": 1}
+  {"P": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\LanmanWorkstation\\Parameters",        "N": "DisableBandwidthThrottling",       "V": 1},
+  {"P": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\LanmanWorkstation\\Parameters",        "N": "FileInfoCacheEntriesMax",          "V": 1024},
+  {"P": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\LanmanWorkstation\\Parameters",        "N": "DirectoryCacheEntriesMax",         "V": 1024},
+  {"P": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\LanmanWorkstation\\Parameters",        "N": "FileNotFoundCacheEntriesMax",      "V": 2048},
+  {"P": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\LanmanServer\\Parameters",             "N": "IRPStackSize",                     "V": 20}
 ]
