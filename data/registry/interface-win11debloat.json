@@ -60,5 +60,8 @@
   {"P": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\Family Safety", "N": "MsaFamilySafety", "V": 0},
   {"P": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\CloudContent", "N": "DisableSoftLanding", "V": 1},
   {"P": "HKCU:\\Control Panel\\Sound", "N": "Beep", "V": "no", "T": "String"},
-  {"P": "HKCU:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Notifications\\Settings\\PowerToys", "N": "Enabled", "V": 0}
+  {"P": "HKCU:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Notifications\\Settings\\PowerToys", "N": "Enabled", "V": 0},
+  {"P": "HKCU:\\Software\\Classes\\CLSID\\{f874310e-b6b7-47dc-bc84-b9e6b38f5903}", "N": "System.IsPinnedToNameSpaceTree", "V": 0},
+  {"P": "HKCU:\\Software\\Classes\\CLSID\\{e88865ea-0e1c-4e20-9aa6-edcd0212c87c}", "N": "System.IsPinnedToNameSpaceTree", "V": 0},
+  {"P": "HKCU:\\SOFTWARE\\Microsoft\\Office\\16.0\\Outlook\\Preferences",           "N": "UseNewOutlook",                  "V": 0}
 ]
