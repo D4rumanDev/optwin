@@ -212,5 +212,15 @@
   {"P": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\WorkplaceJoin", "N": "BlockAADWorkplaceJoin", "V": 1},
   {"P": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\CloudContent", "N": "DisableConsumerAccountStateContent", "V": 1},
   {"P": "HKCU:\\Software\\Policies\\Microsoft\\Windows\\WindowsCopilot",  "N": "TurnOffWindowsCopilot",  "V": 1},
-  {"P": "HKLM:\\Software\\Policies\\Microsoft\\Windows\\WindowsCopilot",  "N": "TurnOffWindowsCopilot",  "V": 1}
+  {"P": "HKLM:\\Software\\Policies\\Microsoft\\Windows\\WindowsCopilot",  "N": "TurnOffWindowsCopilot",  "V": 1},
+  {"P": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsAI",       "N": "DisableSettingsAgent",       "V": 1},
+  {"P": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsAI",       "N": "DisableAgentConnectors",     "V": 1},
+  {"P": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsAI",       "N": "DisableAgentWorkspaces",     "V": 1},
+  {"P": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsAI",       "N": "DisableRemoteAgentConnectors","V": 1},
+  {"P": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsAI",       "N": "AllowCopilotRuntime",        "V": 0},
+  {"P": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\AppPrivacy",      "N": "LetAppsAccessGenerativeAI",  "V": 2},
+  {"P": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\AppPrivacy",      "N": "LetAppsAccessSystemAIModels","V": 2},
+  {"P": "HKCU:\\Software\\Microsoft\\Windows\\Shell\\Copilot",            "N": "IsCopilotAvailable",         "V": 0},
+  {"P": "HKCU:\\Software\\Microsoft\\Windows\\Shell\\Copilot\\BingChat",  "N": "IsUserEligible",             "V": 0},
+  {"P": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced", "N": "ShowCopilotNudges", "V": 0}
 ]

@@ -40,5 +40,8 @@
   {"P": "HKCU:\\Software\\Microsoft\\Office\\16.0\\Excel\\Options",           "N": "EnableCopilot",                      "V": 0},
   {"P": "HKCU:\\Software\\Microsoft\\Office\\16.0\\OneNote\\Options\\Other",   "N": "EnableCopilot",                     "V": 0},
   {"P": "HKCU:\\Software\\Policies\\Microsoft\\office\\16.0\\common\\ai\\training", "N": "optionalconnectedexperiencesenabled", "V": 0},
-  {"P": "HKCU:\\Software\\Policies\\Microsoft\\office\\16.0\\common\\ai",          "N": "contentsafetyserviceenabled",        "V": 0}
+  {"P": "HKCU:\\Software\\Policies\\Microsoft\\office\\16.0\\common\\ai",          "N": "contentsafetyserviceenabled",        "V": 0},
+  {"P": "HKCU:\\Software\\Policies\\Microsoft\\office\\16.0\\common\\privacy",    "N": "controllerconnectedservicesenabled", "V": 2},
+  {"P": "HKCU:\\Software\\Microsoft\\Office\\16.0\\OneNote\\Options\\Other",      "N": "EnableCopilotNotebooks",             "V": 0},
+  {"P": "HKCU:\\Software\\Microsoft\\Office\\16.0\\OneNote\\Options\\Other",      "N": "EnableCopilotSkittle",               "V": 0}
 ]

@@ -61,5 +61,10 @@
   {"P": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\EdgeUpdate", "N": "UpdateDefault",                   "V": 0},
   {"P": "HKLM:\\SOFTWARE\\Microsoft",              "N": "DoNotUpdateToEdgeWithChromium",           "V": 1},
   {"P": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Edge\\ExtensionInstallBlocklist", "N": "1", "V": "ofefcgjbeghpigppfmkologfjadafddi", "T": "String"},
-  {"P": "HKCU:\\SOFTWARE\\Policies\\Microsoft\\Edge\\ExtensionInstallBlocklist", "N": "1", "V": "ofefcgjbeghpigppfmkologfjadafddi", "T": "String"}
+  {"P": "HKCU:\\SOFTWARE\\Policies\\Microsoft\\Edge\\ExtensionInstallBlocklist", "N": "1", "V": "ofefcgjbeghpigppfmkologfjadafddi", "T": "String"},
+  {"P": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Edge", "N": "Microsoft365CopilotChatIconEnabled",          "V": 0},
+  {"P": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Edge", "N": "BuiltInAIAPIsEnabled",                        "V": 0},
+  {"P": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Edge", "N": "AIGenThemesEnabled",                          "V": 0},
+  {"P": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Edge", "N": "DevToolsGenAiSettings",                       "V": 2},
+  {"P": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Edge", "N": "ShareBrowsingHistoryWithCopilotSearchAllowed","V": 0}
 ]

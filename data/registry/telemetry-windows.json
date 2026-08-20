@@ -51,5 +51,16 @@
   {"P": "HKLM:\\Software\\Microsoft\\Windows\\Windows Error Reporting",            "N": "DontSendAdditionalData",  "V": 1},
   {"P": "HKLM:\\Software\\Microsoft\\Windows\\Windows Error Reporting",            "N": "LoggingDisabled",         "V": 1},
   {"P": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows Defender\\Reporting",       "N": "DisableGenericReports",              "V": 1},
-  {"P": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows Defender\\Spynet",          "N": "LocalSettingOverrideSpynetReporting", "V": 0}
+  {"P": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows Defender\\Spynet",          "N": "LocalSettingOverrideSpynetReporting", "V": 0},
+  {"P": "HKCU:\\SOFTWARE\\Policies\\Microsoft\\Windows\\Windows Search",           "N": "AllowCortana",                        "V": 0},
+  {"P": "HKCU:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\DataCollection", "N": "MaxTelemetryAllowed",            "V": 0},
+  {"P": "HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\DataCollection", "N": "MaxTelemetryAllowed",            "V": 0},
+  {"P": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Diagnostics\\DiagTrack",   "N": "ShowedToastAtLevel",             "V": 1},
+  {"P": "HKCU:\\Software\\Microsoft\\input\\Settings",                             "N": "InsightsEnabled",                     "V": 0},
+  {"P": "HKCU:\\SOFTWARE\\Policies\\Microsoft\\Windows\\AdvertisingInfo",          "N": "DisabledByGroupPolicy",               "V": 1},
+  {"P": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\CPSS\\Store\\AdvertisingInfo",               "N": "Value", "V": 0},
+  {"P": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\CPSS\\Store\\InkingAndTypingPersonalization", "N": "Value", "V": 0},
+  {"P": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\CPSS\\Store\\ImproveInkingAndTyping",         "N": "Value", "V": 0},
+  {"P": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\SearchSettings",    "N": "IsMSACloudSearchEnabled",             "V": 0},
+  {"P": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\SearchSettings",    "N": "IsAADCloudSearchEnabled",             "V": 0}
 ]
