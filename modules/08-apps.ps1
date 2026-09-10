@@ -380,6 +380,11 @@ Sep "08.7 POWERSHELL v2 — Desactivar"
         }
     } catch [System.ComponentModel.Win32Exception] {
         Skip "PS v2 ($feat): caracteristica no disponible en esta edicion de Windows"
+    } catch [System.Runtime.InteropServices.COMException] {
+        # Algunas builds de Windows devuelven "Clase no registrada" via el cmdlet
+        # cuando la caracteristica directamente no existe en la imagen (verificado con dism.exe:
+        # 0x800f080c "nombre de caracteristica desconocido"), en vez de un error claro de "no encontrado".
+        Skip "PS v2 ($feat): caracteristica no existe en esta build de Windows"
     } catch {
         Err "PS v2 $feat — $_"
     }

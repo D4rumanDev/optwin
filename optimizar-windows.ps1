@@ -67,11 +67,16 @@ Get-ChildItem $PSScriptRoot -Recurse -Include '*.ps1','*.json' -ErrorAction Sile
 
 . "$ModulesDir\00-core.ps1"
 
+# Normaliza a 2 digitos (p.ej. "3" o "03" -> "03") — PowerShell interpreta listas
+# sin comillas como "-Only 03,05" como numeros y pierde el cero inicial.
+$OnlyNorm = $Only | ForEach-Object { '{0:D2}' -f [int]$_ }
+$SkipNorm = $Skip | ForEach-Object { '{0:D2}' -f [int]$_ }
+
 foreach ($_mod in (Get-ChildItem "$ModulesDir\[0-9][0-9]-*.ps1" | Sort-Object Name)) {
     $_num = ($_mod.BaseName -split '-')[0]
-    if ($_num -eq '00')                        { continue }
-    if ($Only -and $_num -notin $Only)         { continue }
-    if ($Skip -and $_num -in $Skip)            { continue }
+    if ($_num -eq '00')                                { continue }
+    if ($OnlyNorm -and $_num -notin $OnlyNorm)         { continue }
+    if ($SkipNorm -and $_num -in $SkipNorm)            { continue }
     Write-Log "── Módulo ${_num}: $($_mod.BaseName)" "DarkGray"
     . $_mod.FullName
 }
