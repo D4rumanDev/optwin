@@ -1,0 +1,6 @@
+logs/
+*.log
+state.json
+registry-backup-*.json
+registry-backup-*.reg
+backup-*.reg

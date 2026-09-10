@@ -186,6 +186,13 @@ $bthleGhosts = Get-PnpDevice -ErrorAction SilentlyContinue |
                Where-Object { $_.Status -eq 'Unknown' -and $_.InstanceId -match '^BTHLE\\DEV_' }
 Remove-GhostDevices "Dispositivos Bluetooth LE" $bthleGhosts
 
+# Huion TABLETHID: el driver HID genera 5 colecciones (COL01-COL05) por instancia.
+# Cada reconexión a puerto distinto deja una instancia nueva — se acumulan fantasmas
+# que inflan el presupuesto de potencia y disparan "Se sobrepasó la capacidad del puerto USB".
+$tablethidGhosts = Get-PnpDevice -ErrorAction SilentlyContinue |
+                   Where-Object { $_.Status -eq 'Unknown' -and $_.InstanceId -match '^HID\\TABLETHID' }
+Remove-GhostDevices "Huion TABLETHID HID" $tablethidGhosts
+
 # ============================================================
 Sep "09.4 USB POWER MANAGEMENT — anti-overcurrent"
 # ============================================================
