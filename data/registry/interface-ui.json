@@ -43,5 +43,7 @@
   {"P": "HKLM:\\SOFTWARE\\Policies\\WindowsNotepad",                                        "N": "DisableAIFeatures",                "V": 1},
   {"P": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",             "N": "HideFileExt",                      "V": 0},
   {"P": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",             "N": "Hidden",                           "V": 1},
-  {"P": "HKCU:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",             "N": "NavPaneShowVersionControl",        "V": 1}
+  {"P": "HKCU:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",             "N": "NavPaneShowVersionControl",        "V": 1},
+  {"P": "HKLM:\\Software\\Microsoft\\Windows\\CurrentVersion\\Authentication\\LogonUI\\BootAnimation", "N": "DisableStartupSound",             "V": 1},
+  {"P": "HKLM:\\Software\\Microsoft\\Windows\\CurrentVersion\\EditionOverrides",                        "N": "UserSetting_DisableStartupSound", "V": 1}
 ]

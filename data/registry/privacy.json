@@ -222,5 +222,8 @@
   {"P": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\AppPrivacy",      "N": "LetAppsAccessSystemAIModels","V": 2},
   {"P": "HKCU:\\Software\\Microsoft\\Windows\\Shell\\Copilot",            "N": "IsCopilotAvailable",         "V": 0},
   {"P": "HKCU:\\Software\\Microsoft\\Windows\\Shell\\Copilot\\BingChat",  "N": "IsUserEligible",             "V": 0},
-  {"P": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced", "N": "ShowCopilotNudges", "V": 0}
+  {"P": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced", "N": "ShowCopilotNudges", "V": 0},
+  {"P": "HKLM:\\SOFTWARE\\Microsoft\\WindowsUpdate\\UX\\Settings", "N": "BranchReadinessLevel",            "V": 20},
+  {"P": "HKLM:\\SOFTWARE\\Microsoft\\WindowsUpdate\\UX\\Settings", "N": "DeferFeatureUpdatesPeriodInDays", "V": 365},
+  {"P": "HKLM:\\SOFTWARE\\Microsoft\\WindowsUpdate\\UX\\Settings", "N": "DeferQualityUpdatesPeriodInDays", "V": 7}
 ]

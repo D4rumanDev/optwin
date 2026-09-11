@@ -149,3 +149,53 @@ if (Test-SectionApplied "uac-secure" $regUAC) {
     Set-SectionApplied "uac-secure" $regUAC
     OK "UAC: Secure Desktop configurado (ConsentPromptBehaviorAdmin=2)"
 }
+
+# ============================================================
+Sep "06.5 MENU CONTEXTUAL — Herramientas de sistema"
+# ============================================================
+
+try {
+    if (-not (Get-PSDrive -Name HKCR -ErrorAction SilentlyContinue)) {
+        New-PSDrive -Name HKCR -PSProvider Registry -Root HKEY_CLASSES_ROOT | Out-Null
+    }
+
+    $ctxToolsHash = "SFC+DISM+PS1RunAdmin-v1"
+    if (Test-SectionApplied "ctxmenu-systools" $ctxToolsHash) {
+        Skip "Menu contextual herramientas: sin cambios"
+    } else {
+        $bgShell  = "HKCR:\Directory\Background\shell"
+        $ps1Shell = "HKCR:\Microsoft.PowerShellScript.1\Shell"
+
+        # SFC /SCANNOW en menu contextual de carpetas/escritorio
+        $sfcKey = "$bgShell\OptwinSFC"
+        New-Item "$sfcKey\command" -Force -ErrorAction Stop | Out-Null
+        Set-ItemProperty $sfcKey "(Default)"    "Verificar archivos sistema (SFC)" -Type String -Force
+        Set-ItemProperty $sfcKey "Icon"         "imageres.dll,-180"                 -Type String -Force
+        Set-ItemProperty $sfcKey "HasLUAShield" ""                                  -Type String -Force
+        Set-ItemProperty "$sfcKey\command" "(Default)" `
+            'powershell.exe -NoProfile -WindowStyle Hidden -Command "Start-Process cmd.exe -ArgumentList ''/k sfc /scannow'' -Verb RunAs"' `
+            -Type String -Force
+
+        # DISM /RestoreHealth en menu contextual
+        $dismKey = "$bgShell\OptwinDISM"
+        New-Item "$dismKey\command" -Force -ErrorAction Stop | Out-Null
+        Set-ItemProperty $dismKey "(Default)"    "Reparar imagen Windows (DISM)"    -Type String -Force
+        Set-ItemProperty $dismKey "Icon"         "imageres.dll,-180"                 -Type String -Force
+        Set-ItemProperty $dismKey "HasLUAShield" ""                                  -Type String -Force
+        Set-ItemProperty "$dismKey\command" "(Default)" `
+            'powershell.exe -NoProfile -WindowStyle Hidden -Command "Start-Process cmd.exe -ArgumentList ''/k dism /online /cleanup-image /restorehealth & pause'' -Verb RunAs"' `
+            -Type String -Force
+
+        # PS1: ejecutar como administrador (sobre archivos .ps1)
+        $ps1Key = "$ps1Shell\OptwinRunAdmin"
+        New-Item "$ps1Key\command" -Force -ErrorAction Stop | Out-Null
+        Set-ItemProperty $ps1Key "(Default)"    "Ejecutar como admin (PS)"          -Type String -Force
+        Set-ItemProperty $ps1Key "HasLUAShield" ""                                  -Type String -Force
+        Set-ItemProperty "$ps1Key\command" "(Default)" `
+            'powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "Start-Process powershell -Args ''-NoProfile -ExecutionPolicy Bypass -File \"%1\"'' -Verb RunAs"' `
+            -Type String -Force
+
+        Set-SectionApplied "ctxmenu-systools" $ctxToolsHash
+        OK "Menu contextual: SFC, DISM y PS1-admin añadidos (clic derecho en carpeta/escritorio)"
+    }
+} catch { Err "Menu contextual herramientas — $_" }
