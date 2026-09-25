@@ -136,15 +136,23 @@ function Get-RegOperationsFromFile {
     return $ops.ToArray()
 }
 
-# Configura un servicio (Disabled / Manual)
+# Configura un servicio (Disabled / Manual / Automatic)
+# Disabled/Manual: detiene el servicio si esta en marcha. Automatic: nunca lo detiene; lo arranca si esta parado.
 function Set-Svc {
     param([string]$Name, [string]$Mode)
     $svc = $script:AllServices[$Name.ToLower()]
     if (-not $svc) { Skip "Servicio no encontrado: $Name"; return }
+    $isRunning = $svc.Status -eq "Running"
     try {
-        if ("$($svc.StartType)" -eq $Mode -and $svc.Status -ne "Running") { return }
-        if ($svc.Status -eq "Running") { Stop-Service -Name $Name -Force -ErrorAction Stop }
-        Set-Service -Name $Name -StartupType $Mode -ErrorAction Stop
+        if ($Mode -eq "Automatic") {
+            if ("$($svc.StartType)" -eq $Mode -and $isRunning) { return }
+            Set-Service -Name $Name -StartupType $Mode -ErrorAction Stop
+            if (-not $isRunning) { Start-Service -Name $Name -ErrorAction Stop }
+        } else {
+            if ("$($svc.StartType)" -eq $Mode -and -not $isRunning) { return }
+            if ($isRunning) { Stop-Service -Name $Name -Force -ErrorAction Stop }
+            Set-Service -Name $Name -StartupType $Mode -ErrorAction Stop
+        }
         OK "$Mode : $Name"
     } catch {
         Err "$Name — $_"

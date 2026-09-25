@@ -21,12 +21,12 @@ param(
       09-cleanup.ps1     — Limpieza de archivos temporales
       10-scheduler.ps1   — Tarea semanal, background jobs, resumen final
 
-    Genera log en: $env:USERPROFILE\Scripts\logs\optimizar-windows.log
-    Genera backup en: $env:USERPROFILE\Scripts\logs\registry-backup-{timestamp}.reg
+    Genera log en: <carpeta del script>\logs\optimizar-windows.log
+    Genera backup en: <carpeta del script>\logs\registry-backup-{timestamp}.json
 
 .NOTES
-    Ejecutar como Administrador:
-    pwsh -ExecutionPolicy Bypass -File "$env:USERPROFILE\Scripts\optimizar-windows.ps1"
+    Ejecutar como Administrador desde el clon del repo:
+    pwsh -ExecutionPolicy Bypass -File "$env:USERPROFILE\Documents\Proyectos\optwin\optimizar-windows.ps1"
 #>
 
 # ── Bootstrap: relanzar con pwsh (PS7) si se ejecuta desde PS5 ───────────────
@@ -69,8 +69,9 @@ Get-ChildItem $PSScriptRoot -Recurse -Include '*.ps1','*.json' -ErrorAction Sile
 
 # Normaliza a 2 digitos (p.ej. "3" o "03" -> "03") — PowerShell interpreta listas
 # sin comillas como "-Only 03,05" como numeros y pierde el cero inicial.
-$OnlyNorm = $Only | ForEach-Object { '{0:D2}' -f [int]$_ }
-$SkipNorm = $Skip | ForEach-Object { '{0:D2}' -f [int]$_ }
+# Con pwsh -File la lista llega como una sola cadena "03,05": separar por comas antes de convertir.
+$OnlyNorm = $Only -split ',' | Where-Object { $_ } | ForEach-Object { '{0:D2}' -f [int]$_ }
+$SkipNorm = $Skip -split ',' | Where-Object { $_ } | ForEach-Object { '{0:D2}' -f [int]$_ }
 
 foreach ($_mod in (Get-ChildItem "$ModulesDir\[0-9][0-9]-*.ps1" | Sort-Object Name)) {
     $_num = ($_mod.BaseName -split '-')[0]

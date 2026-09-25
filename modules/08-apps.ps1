@@ -362,30 +362,36 @@ if (Test-Path $ptExe) {
 }
 
 # ============================================================
-Sep "08.7 POWERSHELL v2 — Desactivar"
+Sep "08.7 OPTIONAL FEATURES — PowerShell v2 y Recall"
 # ============================================================
 
-# PS v2 no soporta AMSI ni ScriptBlockLogging — bypasea todas las protecciones de PS moderno
-@("MicrosoftWindowsPowerShellV2Root","MicrosoftWindowsPowerShellV2") | ForEach-Object {
-    $feat = $_
+# PS v2 no soporta AMSI ni ScriptBlockLogging — bypasea todas las protecciones de PS moderno.
+# Recall complementa el bloqueo por politica (AllowRecallEnablement=0); no existe antes de W11 24H2.
+@(
+    @{ Name="MicrosoftWindowsPowerShellV2Root"; Label="PS v2"  },
+    @{ Name="MicrosoftWindowsPowerShellV2";     Label="PS v2"  },
+    @{ Name="Recall";                           Label="Recall" }
+) | ForEach-Object {
+    $feat  = $_.Name
+    $label = "$($_.Label) ($feat)"
     try {
         $state = Get-WindowsOptionalFeature -Online -FeatureName $feat -ErrorAction Stop
-        if ($state.State -eq "Disabled") {
-            Skip "PS v2 ($feat): ya desactivado"
+        if ($null -eq $state -or $state.State -eq "Disabled") {
+            Skip "${label}: ya desactivado o no presente"
         } elseif ($state.State -eq "Enabled") {
             Disable-WindowsOptionalFeature -Online -FeatureName $feat -NoRestart -ErrorAction Stop | Out-Null
-            OK "PS v2 desactivado: $feat"
+            OK "$label desactivado"
         } else {
-            Skip "PS v2 ($feat): estado '$($state.State)' — no aplicable"
+            Skip "${label}: estado '$($state.State)' — no aplicable"
         }
     } catch [System.ComponentModel.Win32Exception] {
-        Skip "PS v2 ($feat): caracteristica no disponible en esta edicion de Windows"
+        Skip "${label}: caracteristica no disponible en esta edicion de Windows"
     } catch [System.Runtime.InteropServices.COMException] {
         # Algunas builds de Windows devuelven "Clase no registrada" via el cmdlet
         # cuando la caracteristica directamente no existe en la imagen (verificado con dism.exe:
         # 0x800f080c "nombre de caracteristica desconocido"), en vez de un error claro de "no encontrado".
-        Skip "PS v2 ($feat): caracteristica no existe en esta build de Windows"
+        Skip "${label}: caracteristica no existe en esta build de Windows"
     } catch {
-        Err "PS v2 $feat — $_"
+        Err "$label — $_"
     }
 }

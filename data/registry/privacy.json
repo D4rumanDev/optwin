@@ -68,7 +68,6 @@
   {"P": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Feeds",                           "N": "ShellFeedsTaskbarViewMode",              "V": 2},
   {"P": "HKCU:\\SOFTWARE\\Policies\\Microsoft\\Windows\\Windows Feeds",                         "N": "EnableFeeds",                            "V": 0},
   {"P": "HKLM:\\Software\\Microsoft\\Windows\\CurrentVersion\\Feeds",                           "N": "ShellFeedsTaskbarViewMode",              "V": 2},
-  {"P": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\Windows Feeds",                         "N": "EnableFeeds",                            "V": 0},
   {"P": "HKCU:\\Software\\Microsoft\\MediaPlayer\\Preferences",                                "N": "UsageTracking",                          "V": 0},
   {"P": "HKLM:\\Software\\Microsoft\\MediaPlayer\\Preferences",                                "N": "UsageTracking",                          "V": 0},
   {"P": "HKCU:\\SOFTWARE\\Microsoft\\PCHC",                                                   "N": "PreviousUninstall",                      "V": 1},

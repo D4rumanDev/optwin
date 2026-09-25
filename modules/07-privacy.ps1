@@ -92,24 +92,19 @@ if (Test-SectionApplied "network-hardening-14" $regNetwork14) {
 }
 
 # ============================================================
-Sep "07.15 POWERSHELL — Transcription"
+Sep "07.15 POWERSHELL — Transcription (desactivada)"
 # ============================================================
 
-$psTransDir = "$env:ProgramData\PSTranscripts"
-New-Item -ItemType Directory -Path $psTransDir -Force -ErrorAction SilentlyContinue | Out-Null
-
-$regPSTrans = @(
-    @{ P="HKLM:\SOFTWARE\Policies\Microsoft\Windows\PowerShell\Transcription"; N="EnableTranscripting";    V=1            },
-    @{ P="HKLM:\SOFTWARE\Policies\Microsoft\Windows\PowerShell\Transcription"; N="EnableInvocationHeader"; V=1            },
-    @{ P="HKLM:\SOFTWARE\Policies\Microsoft\Windows\PowerShell\Transcription"; N="OutputDirectory";        V=$psTransDir; T="String" }
-)
-
-if (Test-SectionApplied "ps-transcription" $regPSTrans) {
-    Skip "PowerShell Transcription: sin cambios"
+# Retirada 2026-09-25: la transcripcion guardaba en texto plano todo lo ejecutado en PowerShell
+# (incluidos secretos pasados como argumentos). Limpiar la politica si una version anterior la dejo activa.
+$psTransKey = "HKLM:\SOFTWARE\Policies\Microsoft\Windows\PowerShell\Transcription"
+if (Test-Path $psTransKey) {
+    try {
+        Remove-Item $psTransKey -Recurse -Force -ErrorAction Stop
+        OK "PowerShell Transcription: politica eliminada"
+    } catch { Err "Eliminar PowerShell Transcription — $_" }
 } else {
-    $regPSTrans | ForEach-Object { Set-Reg -Path $_.P -Name $_.N -Value $_.V -Type ($_.T ?? "DWord") }
-    Set-SectionApplied "ps-transcription" $regPSTrans
-    OK "PowerShell Transcription: activo → logs en $psTransDir"
+    Skip "PowerShell Transcription: no configurada"
 }
 
 # DisablePCA en HKCU rompe IShellFolder::SetNameOf (rename de carpetas en Explorer en Windows 11)

@@ -34,6 +34,16 @@ if ((Get-ItemProperty $pcaKey -Name "DisablePCA" -ErrorAction SilentlyContinue).
     } catch { Err "Eliminar DisablePCA HKLM — $_" }
 }
 
+# Limpiar NoLockScreen de HKLM si existe (deshabilita Win+L y la pantalla de bloqueo)
+$lockKey = "HKLM:\SOFTWARE\Policies\Microsoft\Windows\Personalization"
+if ($null -ne (Get-ItemProperty $lockKey -Name "NoLockScreen" -ErrorAction SilentlyContinue).NoLockScreen) {
+    try {
+        Remove-ItemProperty $lockKey -Name "NoLockScreen" -Force -ErrorAction Stop
+        OK "NoLockScreen eliminado de HKLM — Win+L restaurado (cerrar sesion para aplicar)"
+        $script:uiChanged = $true
+    } catch { Err "Eliminar NoLockScreen HKLM — $_" }
+}
+
 if (Test-SectionApplied "interface-ui-reg" $regInterfaceUI) {
     Skip "Interface UI: $($regInterfaceUI.Count) claves — sin cambios"
 } else {

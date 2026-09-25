@@ -108,6 +108,18 @@ try {
     }
 } catch { Err "Teredo — $_" }
 
+# Desactivar URO (UDP Receive Offload) — con URO activo QUIC falla en Brave (video se para / arranca lento)
+try {
+    $udpState = netsh int udp show global 2>&1 | Out-String
+    if ($udpState -imatch "(Receive|Recibir)[^\r\n:]*:\s*disabled") {
+        Skip "URO ya desactivado"
+    } else {
+        netsh int udp set global uro=disabled | Out-Null
+        if ($LASTEXITCODE -eq 0) { OK "URO (UDP Receive Offload) desactivado" }
+        else { Err "URO — netsh devolvio $LASTEXITCODE (parametro no soportado en esta build?)" }
+    }
+} catch { Err "URO — $_" }
+
 # TcpAckFrequency=1 por adaptador (Windows lo lee por NIC, no del global)
 try {
     $nicBase    = "HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters\Interfaces"

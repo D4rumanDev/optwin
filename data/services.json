@@ -16,7 +16,8 @@
     {"name": "WerSvc",                 "comment": "Windows Error Reporting"},
     {"name": "wisvc",                  "comment": "Windows Insider Service"},
     {"name": "PhoneSvc",               "comment": "Phone Link"},
-    {"name": "WSAIFabricSvc",          "comment": "AI Fabric Service"}
+    {"name": "WSAIFabricSvc",          "comment": "AI Fabric Service"},
+    {"name": "HPPrintScanDoctorService", "comment": "HP Print Scan Doctor"}
   ],
   "manual": [
     {"name": "edgeupdate",             "comment": "Microsoft Edge Update"},
@@ -31,7 +32,13 @@
     {"name": "DPS",                    "comment": "Directiva de diagnostico"},
     {"name": "whesvc",                 "comment": "Windows Hardware Error Architecture"},
     {"name": "BthAvctpSvc",            "comment": "Bluetooth AVCTP (audio BT)"},
-    {"name": "WinRing0_1_2_0",         "comment": "MSR/IO kernel driver"}
+    {"name": "WinRing0_1_2_0",         "comment": "MSR/IO kernel driver"},
+    {"name": "CWAUpdaterService",      "comment": "Citrix Workspace Updater"},
+    {"name": "PDF24",                  "comment": "PDF24 (arranca bajo demanda al imprimir)"}
+  ],
+  "automatic": [
+    {"name": "Spooler",                "comment": "Cola de impresion — HP MFP, PDF24"},
+    {"name": "StiSvc",                 "comment": "WIA — escaner HP MFP"}
   ],
   "startup_remove": [
     "Adobe Acrobat Synchronizer",

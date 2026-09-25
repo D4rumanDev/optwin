@@ -6,7 +6,8 @@
 #   - XblAuthManager, XblGameSave, XboxNetApiSvc: Xbox/Gaming
 #   - NvTelemetryContainer: NVIDIA telemetria
 #   - SensrSvc/SensorService: sensores (Manual en portatiles, Disabled en escritorio)
-#   - Spooler, edgeupdate, SSDPSRV: servicios bajo demanda
+#   - edgeupdate, SSDPSRV, PDF24: servicios bajo demanda (Manual)
+#   - Spooler, StiSvc: forzados a Automatic (impresora/escaner HP MFP)
 #   - WinRing0: MSR driver (configurado a Manual para no cargar siempre)
 #
 # CÓMO REVISAR CAMBIOS:
@@ -41,20 +42,22 @@ if (Test-SectionApplied "services-disabled" ($svcDisabledList + $svcSensorMode) 
 }
 
 # ============================================================
-Sep "03.2 SERVICIOS — Poner en Manual"
+Sep "03.2 SERVICIOS — Manual y Automatic forzados"
 # ============================================================
 
-$svcManualList   = $svcData.manual   | Select-Object -ExpandProperty name
-
-if (Test-SectionApplied "services-manual" $svcManualList -MaxAgeDays 6) {
-    Skip "Servicios en manual: sin cambios desde hace <6 dias"
-} else {
-    # Google Updater: buscar por patron en cache (nombre cambia con cada version)
-    $script:AllServices.Values | Where-Object { $_.Name -match "^GoogleUpdater" } |
-        ForEach-Object { Set-Svc -Name $_.Name -Mode "Manual" }
-
-    $svcManualList | ForEach-Object { Set-Svc -Name $_ -Mode "Manual" }
-    Set-SectionApplied "services-manual" $svcManualList
+foreach ($svcGroup in @(@{ Key="manual"; Mode="Manual" }, @{ Key="automatic"; Mode="Automatic" })) {
+    $svcList = $svcData.($svcGroup.Key) | Select-Object -ExpandProperty name
+    if (Test-SectionApplied "services-$($svcGroup.Key)" $svcList -MaxAgeDays 6) {
+        Skip "Servicios $($svcGroup.Mode): sin cambios desde hace <6 dias"
+        continue
+    }
+    if ($svcGroup.Mode -eq "Manual") {
+        # Google Updater: buscar por patron en cache (nombre cambia con cada version)
+        $script:AllServices.Values | Where-Object { $_.Name -match "^GoogleUpdater" } |
+            ForEach-Object { Set-Svc -Name $_.Name -Mode "Manual" }
+    }
+    $svcList | ForEach-Object { Set-Svc -Name $_ -Mode $svcGroup.Mode }
+    Set-SectionApplied "services-$($svcGroup.Key)" $svcList
 }
 
 # ============================================================
